@@ -76,22 +76,20 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
     ], 'AFTER `accepted_credit_cards`');
     $this->addTask('Drop civicrm_activity.is_current_revision index', 'dropIndex', 'civicrm_activity', 'index_is_current_revision');
 
+    $bin_collation = strpos(CRM_Core_BAO_SchemaHandler::getInUseCollation(), 'utf8mb4') !== FALSE ? 'utf8mb4_bin' : 'utf8_bin';
     $this->addTask('Make WordReplacement "find_word" required.', 'alterSchemaField', 'WordReplacement', 'find_word', [
-      'title' => ts('Replaced Word'),
       'sql_type' => 'varchar(255)',
-      'input_type' => 'Text',
       'description' => ts('Word which need to be replaced'),
       'add' => '4.4',
-      'collate' => 'utf8_bin',
+      'collate' => $bin_collation,
       'required' => TRUE,
     ]);
     $this->addTask('Make WordReplacement "replace_word" required', 'alterSchemaField', 'WordReplacement', 'replace_word', [
-      'title' => ts('Replacement Word'),
       'sql_type' => 'varchar(255)',
-      'input_type' => 'Text',
       'description' => ts('Word which will replace the word in find'),
       'add' => '4.4',
-      'collate' => 'utf8_bin',
+      'collate' => $bin_collation,
+      'required' => TRUE,
     ]);
   }
 
