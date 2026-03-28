@@ -85,7 +85,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($inputs[1], $byLangMsgid['en']['parting']);
     $this->assertEquals($inputs[2], $byLangMsgid['fr']['greeting']);
     $this->assertEquals($inputs[3], $byLangMsgid['fr']['parting']);
-    $this->assertEquals($inputs[5], $byLangMsgid[NULL]['greeting']);
+    $this->assertEquals($inputs[5], $byLangMsgid['']['greeting']);
   }
 
   public function testCollect(): void {
