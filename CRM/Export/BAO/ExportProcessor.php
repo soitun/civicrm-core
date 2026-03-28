@@ -1171,6 +1171,9 @@ class CRM_Export_BAO_ExportProcessor {
     }
     elseif ($this->isExportSpecifiedPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
       $paymentTableId = $this->getPaymentTableID();
+      if (!$iterationDAO->$paymentTableId) {
+        return NULL;
+      }
       $paymentData = $paymentDetails[$iterationDAO->$paymentTableId] ?? NULL;
       $payFieldMapper = [
         'componentPaymentField_total_amount' => 'total_amount',
