@@ -1330,7 +1330,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         break;
 
       case 'Money':
-        $currencyField = $this->getCurrencyField($key);
+        $currencyField = $this->getCurrencyField($key) ?? '';
         $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
         $formatted = \Civi::format()->money($rawValue, $currency);
         break;
