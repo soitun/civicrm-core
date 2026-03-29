@@ -837,7 +837,6 @@ class CRM_Core_DAO extends DB_DataObject {
         \Civi::dispatcher()->dispatch("civi.dao.postInsert", $event);
       }
     }
-    $this->free();
 
     if ($hook) {
       CRM_Utils_Hook::postSave($this);
@@ -880,7 +879,6 @@ class CRM_Core_DAO extends DB_DataObject {
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
     \Civi::dispatcher()->dispatch("civi.dao.postDelete", $event);
-    $this->free();
 
     $this->clearDbColumnValueCache();
 
@@ -1580,7 +1578,6 @@ LIKE %1
     if ($row) {
       $ret = $row[0];
     }
-    $this->free();
     return $ret;
   }
 
@@ -1704,7 +1701,6 @@ LIKE %1
         $result = TRUE;
       }
     }
-    $object->free();
     return $result;
   }
 
