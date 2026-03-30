@@ -596,7 +596,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     ];
 
     foreach ($column['subsearch']['filters'] as $filterSetting) {
-      $out['subsearch']['filters'][$filterSetting['subsearch_field']] = $data[$filterSetting['parent_field']] ?? NULL;
+      // Use parent_field from column data
+      if (isset($filterSetting['parent_field'])) {
+        $value = $data[$filterSetting['parent_field']] ?? NULL;
+      }
+      // Use fixed value
+      else {
+        $value = $filterSetting['value'] ?? NULL;
+      }
+      if (isset($value)) {
+        $out['subsearch']['filters'][$filterSetting['subsearch_field']] = $value;
+      }
     }
 
     return $out;
