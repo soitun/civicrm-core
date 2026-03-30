@@ -1369,88 +1369,6 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Checks if CONSTRAINT keyword exists for a specified table.
-   *
-   * @deprecated in 5.72 will be removed in 5.85
-   */
-  public static function schemaRequiresRebuilding($tables = ["civicrm_contact"]) {
-    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
-    $show = [];
-    foreach ($tables as $tableName) {
-      if (!array_key_exists($tableName, $show)) {
-        $query = "SHOW CREATE TABLE $tableName";
-        $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
-
-        if (!$dao->fetch()) {
-          throw new CRM_Core_Exception('Show create table failed.');
-        }
-
-        $show[$tableName] = $dao->Create_Table;
-      }
-
-      $result = (bool) preg_match("/\bCONSTRAINT\b\s/i", $show[$tableName]);
-      if ($result == TRUE) {
-        continue;
-      }
-      else {
-        return FALSE;
-      }
-    }
-    return TRUE;
-  }
-
-  /**
-   * Checks if the FK constraint name is in the format 'FK_tableName_columnName'
-   * for a specified column of a table.
-   *
-   * @deprecated in 5.72 will be removed in 5.85
-   */
-  public static function checkFKConstraintInFormat($tableName, $columnName) {
-    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
-    static $show = [];
-
-    if (!array_key_exists($tableName, $show)) {
-      $query = "SHOW CREATE TABLE $tableName";
-      $dao = CRM_Core_DAO::executeQuery($query);
-
-      if (!$dao->fetch()) {
-        throw new CRM_Core_Exception('query failed');
-      }
-
-      $show[$tableName] = $dao->Create_Table;
-    }
-    $constraint = "`FK_{$tableName}_{$columnName}`";
-    $pattern = "/\bCONSTRAINT\b\s+%s\s+\bFOREIGN\s+KEY\b\s/i";
-    return (bool) preg_match(sprintf($pattern, $constraint), $show[$tableName]);
-  }
-
-  /**
-   * Check whether a specific column in a specific table has always the same value.
-   *
-   * @deprecated in 5.72 will be removed in 5.85
-   */
-  public static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
-    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
-    $query = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $result = $dao->fetch() ? FALSE : TRUE;
-    return $result;
-  }
-
-  /**
-   * Check whether a specific column in a specific table is always NULL.
-   *
-   * @deprecated in 5.72 will be removed in 5.85
-   */
-  public static function checkFieldIsAlwaysNull($tableName, $columnName) {
-    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
-    $query = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $result = $dao->fetch() ? FALSE : TRUE;
-    return $result;
-  }
-
-  /**
    * Checks if this DAO's table ought to exist.
    *
    * If there are pending DB updates, this function compares the CiviCRM version of the table to the current schema version.
@@ -1705,29 +1623,6 @@ LIKE %1
   }
 
   /**
-   * Unused function.
-   * @deprecated in 5.72 will be removed in 5.85
-   */
-  public static function getSortString($sort, $default = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
-    // check if sort is of type CRM_Utils_Sort
-    if (is_a($sort, 'CRM_Utils_Sort')) {
-      return $sort->orderBy();
-    }
-
-    $sortString = '';
-
-    // is it an array specified as $field => $sortDirection ?
-    if ($sort) {
-      foreach ($sort as $k => $v) {
-        $sortString .= "$k $v,";
-      }
-      return rtrim($sortString, ',');
-    }
-    return $default;
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @internal - extensions should always use the api
@@ -1758,20 +1653,6 @@ LIKE %1
       return $object;
     }
     return NULL;
-  }
-
-  /**
-   * Unused function.
-   *
-   * @deprecated in 5.47 will be removed in 5.80
-   */
-  public static function deleteEntityContact($daoName, $contactId) {
-    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
-    $object = new $daoName();
-
-    $object->entity_table = 'civicrm_contact';
-    $object->entity_id = $contactId;
-    $object->delete();
   }
 
   /**
