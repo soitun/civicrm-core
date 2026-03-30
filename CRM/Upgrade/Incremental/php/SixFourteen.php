@@ -91,6 +91,16 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
       'collate' => $bin_collation,
       'required' => TRUE,
     ]);
+    $this->addTask('Replace TranslationSource "index_source_key" with "UI_source_key"', 'replaceTranslationSourceIndex');
+  }
+
+  /**
+   * @see https://lab.civicrm.org/dev/core/-/issues/6143
+   */
+  public static function replaceTranslationSourceIndex() {
+    \CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices(FALSE, ['civicrm_translation_source']));
+    \CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_translation_source', 'index_source_key');
+    return TRUE;
   }
 
 }
