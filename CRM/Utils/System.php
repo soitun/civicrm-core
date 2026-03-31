@@ -1036,10 +1036,7 @@ class CRM_Utils_System {
    */
   public static function explode($separator, $string, $limit) {
     $result = explode($separator, ($string ?? ''), $limit);
-    for ($i = count($result); $i < $limit; $i++) {
-      $result[$i] = NULL;
-    }
-    return $result;
+    return array_pad($result, $limit, NULL);
   }
 
   /**
