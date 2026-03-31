@@ -82,7 +82,9 @@ return [
     ],
     'source_key' => [
       'title' => ts('Source Key'),
-      'sql_type' => 'char(22) CHARACTER SET ascii',
+      // NOTE: set to match Translation.source_key
+      // Q: why is this character set / collation preferred over standard uf8?
+      'sql_type' => 'char(22) CHARACTER SET ascii COLLATE ascii_general_ci',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('hash(source)'),

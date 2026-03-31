@@ -92,6 +92,7 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
       'required' => TRUE,
     ]);
     $this->addTask('Replace TranslationSource "index_source_key" with "UI_source_key"', 'replaceTranslationSourceIndex');
+    $this->addTask('Ensure TranslationSource.source_key foreign key constraint exists', 'ensureTranslationSourceForeignKey');
   }
 
   /**
@@ -100,6 +101,45 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
   public static function replaceTranslationSourceIndex() {
     \CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices(FALSE, ['civicrm_translation_source']));
     \CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_translation_source', 'index_source_key');
+    return TRUE;
+  }
+
+  /**
+   * Constraint likely not have been created in 6.7 upgrader -
+   * may also have collation issues
+   */
+  public static function ensureTranslationSourceForeignKey($ctx) {
+    // drop any existing constraint so we can update collations
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_translation', 'FK_civicrm_translation_source_key');
+
+    // ensure matching character sets + collations on the two fields
+    // Q: why do we use ascii rather than standard utf8?
+    $sqlType = 'char(22) CHARACTER SET ascii COLLATE ascii_general_ci';
+
+    self::alterSchemaField($ctx, 'Translation', 'source_key', [
+      'title' => ts('Source Key'),
+      'input_type' => 'Text',
+      'sql_type' => $sqlType,
+      'required' => FALSE,
+      'description' => ts('Alternate FK when using translation_source instead of entity_table / entity_id'),
+    ]);
+
+    self::alterSchemaField($ctx, 'TranslationSource', 'source_key', [
+      'title' => ts('Source Key'),
+      'sql_type' => $sqlType,
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'description' => ts('hash(source)'),
+    ]);
+
+    $sql = CRM_Core_BAO_SchemaHandler::buildForeignKeySQL([
+      'fk_table_name' => 'civicrm_translation_source',
+      'fk_field_name' => 'source_key',
+      'name' => 'source_key',
+      'fk_attributes' => ' ON DELETE CASCADE',
+    ], "\n", " ADD ", 'civicrm_translation');
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_translation " . $sql, [], TRUE, NULL, FALSE, FALSE);
+
     return TRUE;
   }
 
