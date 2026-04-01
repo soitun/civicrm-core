@@ -67,7 +67,9 @@ return [
     ],
     'context_key' => [
       'title' => ts('Context Key'),
-      'sql_type' => 'char(22) CHARACTER SET ascii',
+      // NOTE: set to match source_key
+      // Q: why is this character set / collation preferred over standard uf8?
+      'sql_type' => 'char(22) CHARACTER SET ascii COLLATE ascii_general_ci',
       'required' => TRUE,
       'description' => ts('hash(entity_name,entity_id,entity_field,entity)'),
       'add' => '6.7.alpha1',

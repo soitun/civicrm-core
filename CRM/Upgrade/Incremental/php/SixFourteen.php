@@ -132,6 +132,13 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
       'description' => ts('hash(source)'),
     ]);
 
+    self::alterSchemaField($ctx, 'TranslationSource', 'context_key', [
+      'title' => ts('Context Key'),
+      'sql_type' => $sqlType,
+      'required' => TRUE,
+      'description' => ts('hash(entity_name,entity_id,entity_field,entity)'),
+    ]);
+
     $sql = CRM_Core_BAO_SchemaHandler::buildForeignKeySQL([
       'fk_table_name' => 'civicrm_translation_source',
       'fk_field_name' => 'source_key',
