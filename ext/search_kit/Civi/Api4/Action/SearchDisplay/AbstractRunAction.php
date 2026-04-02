@@ -1814,6 +1814,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // If not found, check if this is a subsearch embedded within another display
       if (!$afform['searchDisplay']) {
         $displayTags = array_column(Display::getDisplayTypes(['name']), 'name');
+        $displayTags[] = 'crm-search-display';
         $displays = \CRM_Utils_Array::findAll(
           $afform['layout'],
          fn($element) => isset($element['#tag']) && in_array($element['#tag'], $displayTags, TRUE)

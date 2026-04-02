@@ -3,6 +3,7 @@
 namespace Civi\AfformAdmin;
 
 use Civi\Afform\Placement\PlacementUtils;
+use Civi\Afform\Utils;
 use Civi\Api4\Afform;
 use Civi\Api4\Entity;
 use Civi\Api4\Utils\CoreUtil;
@@ -350,6 +351,8 @@ class AfformAdminMeta {
       $dateRanges = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
       $dateRanges = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateRanges);
 
+      $searchDisplayTags = Utils::getSearchDisplayTags();
+
       // Allow data to be modified by event listeners
       $data = [
         // @see afform-entity-php/mixin.php
@@ -359,6 +362,7 @@ class AfformAdminMeta {
         'styles' => &$styles,
         'permissions' => &$permissions,
         'dateRanges' => &$dateRanges,
+        'searchDisplayTags' => &$searchDisplayTags,
       ];
       $event = GenericHookEvent::create($data);
       \Civi::dispatcher()->dispatch('civi.afform_admin.metadata', $event);

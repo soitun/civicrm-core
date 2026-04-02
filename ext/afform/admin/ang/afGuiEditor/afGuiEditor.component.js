@@ -581,7 +581,7 @@
         const searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
         return searchFieldsets.reduce((searchDisplays, fieldset) => {
           const displayElement = afGui.findRecursive(fieldset['#children'], (item) => {
-            return item['search-name'] && item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
+            return item['search-name'] && item['#tag'] && afGui.meta.searchDisplayTags.includes(item['#tag']);
           })[0];
           if (displayElement) {
             searchDisplays[displayElement['search-name'] + (displayElement['display-name'] ? '.' + displayElement['display-name'] : '')] = {

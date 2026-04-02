@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Utils;
 use Civi\AfformAdmin\AfformAdminMeta;
 use Civi\Api4\Afform;
 use Civi\Api4\AfformBehavior;
@@ -178,8 +179,8 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         $displayTags[] = ['search-name' => $searchName, 'display-name' => $displayName];
       }
       else {
-        foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
-          $displayTags = array_merge($displayTags, \CRM_Utils_Array::findAll($info['definition']['layout'], ['#tag' => $displayType['name']]));
+        foreach (Utils::getSearchDisplayTags() as $displayType) {
+          $displayTags = array_merge($displayTags, \CRM_Utils_Array::findAll($info['definition']['layout'], ['#tag' => $displayType]));
         }
       }
       foreach ($displayTags as $displayTag) {

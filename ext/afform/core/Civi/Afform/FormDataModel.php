@@ -346,13 +346,14 @@ class FormDataModel {
    *
    * @param array $node
    */
-  public function findSearchDisplay($node) {
-    foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
-      foreach (AHQ::getTags($node, $displayType['name']) as $display) {
+  public function findSearchDisplay(array $node): ?string {
+    foreach (Utils::getSearchDisplayTags() as $displayType) {
+      foreach (AHQ::getTags($node, $displayType) as $display) {
         $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
         return $display['display-name'];
       }
     }
+    return NULL;
   }
 
   /**
@@ -366,14 +367,14 @@ class FormDataModel {
   /**
    * @return array{type: string, fields: array, joins: array, security: string, actions: array}
    */
-  public function getEntity($entityName) {
+  public function getEntity(string $entityName): ?array {
     return $this->entities[$entityName] ?? NULL;
   }
 
   /**
    * @return array{fields: array, searchName: string}
    */
-  public function getSearchDisplay($displayName) {
+  public function getSearchDisplay(string $displayName): ?array {
     return $this->searchDisplays[$displayName] ?? NULL;
   }
 
