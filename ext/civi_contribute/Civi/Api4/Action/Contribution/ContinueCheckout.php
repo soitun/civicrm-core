@@ -16,6 +16,9 @@ class ContinueCheckout extends AbstractAction {
   protected string $token;
 
   public function _run(Result $result): void {
+    if (!\Civi::settings()->get('contribute_enable_afform_contributions')) {
+      throw new \CRM_Core_Exception('You must opt in to Enable FormBuilder Contributions before using Checkout');
+    }
 
     try {
       $session = CheckoutSession::restoreFromToken($this->token);
