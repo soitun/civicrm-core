@@ -13,6 +13,7 @@
 namespace Civi\Afform;
 
 use Civi\Api4\Utils\FormattingUtil;
+use Civi\Search\Display;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -149,6 +150,12 @@ class Utils {
 
       self::saveTranslations($form, $html);
     }
+  }
+
+  public static function getSearchDisplayTags(): array {
+    $displayTags = array_column(Display::getDisplayTypes(['name'], TRUE), 'name');
+    $displayTags[] = 'crm-search-display';
+    return $displayTags;
   }
 
 }
