@@ -347,11 +347,9 @@ class FormDataModel {
    * @param array $node
    */
   public function findSearchDisplay(array $node): ?string {
-    foreach (Utils::getSearchDisplayTags() as $displayType) {
-      foreach (AHQ::getTags($node, $displayType) as $display) {
-        $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
-        return $display['display-name'];
-      }
+    foreach (AHQ::getTags($node, Utils::getSearchDisplayTags()) as $display) {
+      $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
+      return $display['display-name'];
     }
     return NULL;
   }
