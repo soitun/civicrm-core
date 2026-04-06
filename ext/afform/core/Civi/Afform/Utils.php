@@ -150,6 +150,8 @@ class Utils {
       // but 3rd parties must specify their own template file names.
       foreach ($inputTypes as $name => &$inputType) {
         $inputType += [
+          'module' => 'af',
+          'admin_module' => 'afGuiEditor',
           'template' => "~/af/fields/$name.html",
           'admin_template' => "~/afGuiEditor/inputType/$name.html",
         ];
@@ -160,6 +162,19 @@ class Utils {
       ];
       $event = GenericHookEvent::create($data);
       \Civi::dispatcher()->dispatch('civi.afform.input_types', $event);
+
+      // If module and admin_module are not specified, infer them from template file names.
+      foreach ($inputTypes as &$inputType) {
+        if (!isset($inputType['module']) && isset($inputType['template']) && str_starts_with($inputType['template'], '~/')) {
+          [, $moduleName] = explode('/', $inputType['template']);
+          $inputType['module'] = $moduleName;
+        }
+        if (!isset($inputType['admin_module']) && isset($inputType['admin_template']) && str_starts_with($inputType['admin_template'], '~/')) {
+          [, $moduleName] = explode('/', $inputType['admin_template']);
+          $inputType['admin_module'] = $moduleName;
+        }
+      }
+
       \Civi::cache('metadata')->set('afform.input_types', $inputTypes);
     }
     return $inputTypes;
