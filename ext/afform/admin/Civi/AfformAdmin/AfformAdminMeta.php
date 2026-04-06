@@ -198,7 +198,7 @@ class AfformAdminMeta {
    *
    * @return array
    */
-  public static function getMetadata() {
+  public static function getMetadata(): array {
     $data = \Civi::cache('metadata')->get('afform_admin.metadata');
     if (!$data) {
       $entities = [
@@ -215,25 +215,6 @@ class AfformAdminMeta {
         ->execute()->indexBy('name');
       foreach ($contactAndCustom as $name => $entity) {
         $entities[$name] = self::entityToAfformMeta($entity);
-      }
-
-      // Call getFields on getFields to get input type labels
-      $inputTypeLabels = \Civi\Api4\Contact::getFields(FALSE)
-        ->setLoadOptions(TRUE)
-        ->setAction('getFields')
-        ->addWhere('name', '=', 'input_type')
-        ->execute()
-        ->column('options')[0];
-      // Scan for input types, use label from getFields if available
-      $inputTypes = [];
-      foreach (glob(__DIR__ . '/../../ang/afGuiEditor/inputType/*.html') as $file) {
-        $name = basename($file, '.html');
-        $inputTypes[] = [
-          'name' => $name,
-          'label' => $inputTypeLabels[$name] ?? _ts($name),
-          'template' => '~/af/fields/' . $name . '.html',
-          'admin_template' => '~/afGuiEditor/inputType/' . $name . '.html',
-        ];
       }
 
       // Static elements
@@ -357,7 +338,6 @@ class AfformAdminMeta {
       $data = [
         // @see afform-entity-php/mixin.php
         'entities' => &$entities,
-        'inputTypes' => &$inputTypes,
         'elements' => &$elements,
         'styles' => &$styles,
         'permissions' => &$permissions,
@@ -368,7 +348,15 @@ class AfformAdminMeta {
       \Civi::dispatcher()->dispatch('civi.afform_admin.metadata', $event);
       \Civi::cache('metadata')->set('afform_admin.metadata', $data);
     }
+    return $data;
+  }
 
+  public static function getModuleSettings(): array {
+    $data = self::getMetadata();
+    // InputTypes have their own hook and cache.
+    $inputTypes = Utils::getInputTypes();
+    // Convert to non-associative array.
+    $data['inputTypes'] = array_map(fn($inputType, $name) => $inputType + ['name' => $name], $inputTypes, array_keys($inputTypes));
     return $data;
   }
 
