@@ -917,6 +917,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Get the array of price field value IDs on the form that 'count' as
    * full, which will be frozen.
    *
+   * Exclude any options that have currently been selected, in a select, for the participant.
+   *
    * @param array $field
    *
    * @return array
@@ -924,8 +926,18 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   protected function getOptionFullPriceFieldValues(array $field): array {
     $optionFullIds = [];
-    foreach ($field['options'] ?? [] as &$option) {
-      if ($this->isOptionFullID($option, $field)) {
+    $selectedSelectPriceFieldIds = [];
+    if ($field['html_type'] === 'Select') {
+      if (!empty($this->_values['line_items'])) {
+        foreach ($this->_values['line_items'] as $lineItem) {
+          $selectedSelectPriceFieldIds[] = $lineItem['price_field_value_id'];
+        }
+      }
+    }
+    foreach ($field['options'] ?? [] as $option) {
+      if ($this->getIsOptionFull($option) &&
+        !(in_array($option['id'], $selectedSelectPriceFieldIds))
+      ) {
         $optionFullIds[$option['id']] = $option['id'];
       }
     }
@@ -933,34 +945,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Should we disable this option because it is full?
-   *
-   * We don't disable the option if the user has already selected it.
-   *
-   * @param array $option
-   * @param array $field
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   */
-  private function isOptionFullID(array $option, array $field) : bool {
-    $optionFull = $this->getIsOptionFull($option);
-    if ($optionFull && $field['html_type'] === 'Select') {
-      $defaultPricefieldIds = [];
-      if (!empty($this->_values['line_items'])) {
-        foreach ($this->_values['line_items'] as $lineItem) {
-          $defaultPricefieldIds[] = $lineItem['price_field_value_id'];
-        }
-      }
-      if (in_array($option['id'], $defaultPricefieldIds)) {
-        $optionFull = FALSE;
-      }
-    }
-    return $optionFull;
-  }
-
-  /**
    * Is this option full?
+   *
+   * Excluding the current participant's saved options.
    *
    * @param array $option
    *
@@ -968,22 +955,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getIsOptionFull(array $option): bool {
-    $isFull = FALSE;
-    $currentParticipantNo = (int) substr($this->_name, 12);
     $maxValue = $option['max_value'] ?? 0;
-    $priceFieldValueID = $option['id'];
-    //get the current price event price set options count.
-    $currentOptionsCount = $this->getPriceSetOptionCount();
-    $currentTotalCount = $currentOptionsCount[$priceFieldValueID] ?? 0;
-    $totalCount = $currentTotalCount + $this->getUsedSeatsCount($priceFieldValueID);
-
-    if ($maxValue &&
-      (($totalCount >= $maxValue) &&
-        (empty($this->_lineItem[$currentParticipantNo][$priceFieldValueID]['price_field_id']) || $this->getUsedSeatsCount($priceFieldValueID) >= $maxValue))
-    ) {
-      $isFull = TRUE;
+    if (!$maxValue) {
+      return FALSE;
     }
-    return $isFull;
+    $currentTotalCount = $this->getPriceSetOptionCount()[$option['id']] ?? 0;
+    $usedSeatsCount = $this->getUsedSeatsCount($option['id']);
+    $totalCount = $currentTotalCount + $usedSeatsCount;
+
+    $currentParticipantNo = (int) substr($this->_name, 12);
+    if ($usedSeatsCount >= $maxValue ||
+        ($totalCount >= $maxValue && empty($this->_lineItem[$currentParticipantNo][$option['id']]['price_field_id']))
+      ) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
