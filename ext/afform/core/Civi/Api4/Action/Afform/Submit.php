@@ -20,11 +20,6 @@ class Submit extends AbstractProcessor {
   use ArrayQueryActionTrait;
 
   /**
-   * @deprecated - You may simply use the event name directly. dev/core#1744
-   */
-  const EVENT_NAME = 'civi.afform.submit';
-
-  /**
    * Submitted values
    * @var array
    * @required
