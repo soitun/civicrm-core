@@ -1507,7 +1507,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $optionsCountDetails = $priceSetDetails['optionsCountDetails']['fields'];
     }
 
-    $optionMaxValues = $fieldSelected = [];
+    $optionMaxValues = $optionWithoutCurrentValues = $fieldSelected = [];
+    $currentParticipantNo = (int) substr($this->_name, 12);
     foreach ($params as $pNum => $values) {
       if (!is_array($values) || $values == 'skip') {
         continue;
@@ -1543,15 +1544,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           else {
             $currentMaxValue = 1;
           }
-
           if (isset($optionsCountDetails[$priceFieldId], $optionsCountDetails[$priceFieldId]['options'][$optId])) {
             $currentMaxValue = $optionsCountDetails[$priceFieldId]['options'][$optId] * $optVal;
           }
-          if (empty($optionMaxValues)) {
-            $optionMaxValues[$priceFieldId][$optId] = $currentMaxValue;
-          }
-          else {
-            $optionMaxValues[$priceFieldId][$optId] = $currentMaxValue + ($optionMaxValues[$priceFieldId][$optId] ?? 0);
+          $optionMaxValues[$priceFieldId][$optId] = $currentMaxValue + ($optionMaxValues[$priceFieldId][$optId] ?? 0);
+          if ($pNum !== $currentParticipantNo) {
+            $optionWithoutCurrentValues[$priceFieldId][$optId] = $currentMaxValue + ($optionWithoutCurrentValues[$priceFieldId][$optId] ?? 0);
           }
           $soldOutPnum[$optId] = $pNum;
         }
@@ -1559,7 +1557,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       //validate for price field selection.
       if (empty($fieldSelected[$pNum])) {
-        $errors[$pNum]['_qf_default'] = ts('SELECT at least one OPTION FROM EVENT Fee(s).');
+        $errors[$pNum]['_qf_default'] = ts('Select at least one option.');
       }
     }
 
@@ -1569,18 +1567,19 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $optMax = $optionsMaxValueDetails[$fieldId]['options'][$optId];
         $opDbCount = $this->getUsedSeatsCount($optId);
         $total += $opDbCount;
+        $totalWithoutCurrent = $opDbCount + ($optionWithoutCurrentValues[$fieldId][$optId] ?? 0);
         if ($optMax && ($total > $optMax)) {
-          if ($opDbCount && ($opDbCount >= $optMax)) {
+          if ($totalWithoutCurrent && ($totalWithoutCurrent >= $optMax)) {
             $errors[$soldOutPnum[$optId]]["price_{$fieldId}"]
               = ts('Sorry, this option is currently sold out.');
           }
-          elseif (($optMax - $opDbCount) == 1) {
+          elseif (($optMax - $totalWithoutCurrent) == 1) {
             $errors[$soldOutPnum[$optId]]["price_{$fieldId}"]
-              = ts('Sorry, currently only a single space is available for this option.', [1 => ($optMax - $opDbCount)]);
+              = ts('Sorry, currently only a single space is available for this option.');
           }
           else {
             $errors[$soldOutPnum[$optId]]["price_{$fieldId}"]
-              = ts('Sorry, currently only %1 spaces are available for this option.', [1 => ($optMax - $opDbCount)]);
+              = ts('Sorry, currently only %1 spaces are available for this option.', [1 => ($optMax - $totalWithoutCurrent)]);
           }
         }
       }
