@@ -13,6 +13,7 @@
 namespace Civi\Afform;
 
 use Civi\Api4\Utils\FormattingUtil;
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Search\Display;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -83,6 +84,100 @@ class Utils {
       'REGEXP BINARY' => E::ts('Matches Pattern (case-sensitive)'),
       'NOT REGEXP BINARY' => E::ts("Doesn't Match Pattern (case-sensitive)"),
     ];
+  }
+
+  public static function getInputTypes(): array {
+    $inputTypes = \Civi::cache('metadata')->get('afform.input_types');
+    if ($inputTypes === NULL) {
+      // Note: When adding a new input type, one must also create corresponding template and admin_template files.
+      $inputTypes = [
+        'ChainSelect' => [
+          'label' => E::ts('Chain-Select'),
+        ],
+        'CheckBox' => [
+          'label' => E::ts('Checkboxes'),
+        ],
+        'Date' => [
+          'label' => E::ts('Date Picker'),
+        ],
+        'DisplayOnly' => [
+          'label' => E::ts('Display Only'),
+        ],
+        'Email' => [
+          'label' => E::ts('Email'),
+        ],
+        'EntityRef' => [
+          'label' => E::ts('Autocomplete Entity'),
+        ],
+        'File' => [
+          'label' => E::ts('File'),
+        ],
+        'Hidden' => [
+          'label' => E::ts('Hidden'),
+        ],
+        'Location' => [
+          'label' => E::ts('Address Location'),
+        ],
+        'Number' => [
+          'label' => E::ts('Number'),
+        ],
+        'Radio' => [
+          'label' => E::ts('Radio Buttons'),
+        ],
+        'Range' => [
+          'label' => E::ts('Range'),
+        ],
+        'RichTextEditor' => [
+          'label' => E::ts('Rich Text Editor'),
+        ],
+        'Select' => [
+          'label' => E::ts('Select'),
+        ],
+        'Text' => [
+          'label' => E::ts('Single-Line Text'),
+        ],
+        'TextArea' => [
+          'label' => E::ts('Multi-Line Text'),
+        ],
+        'Toggle' => [
+          'label' => E::ts('Toggle Switch'),
+        ],
+        'Url' => [
+          'label' => E::ts('URL'),
+        ],
+      ];
+      // Input types shipped with Afform all follow this template file name convention,
+      // but 3rd parties must specify their own template file names.
+      foreach ($inputTypes as $name => &$inputType) {
+        $inputType += [
+          'module' => 'af',
+          'admin_module' => 'afGuiEditor',
+          'template' => "~/af/fields/$name.html",
+          'admin_template' => "~/afGuiEditor/inputType/$name.html",
+        ];
+      }
+      // Allow input types to be modified by event listeners
+      $data = [
+        'inputTypes' => &$inputTypes,
+      ];
+      $event = GenericHookEvent::create($data);
+      \Civi::dispatcher()->dispatch('civi.afform.input_types', $event);
+
+      // If module and admin_module are not specified, infer them from template file names.
+      foreach ($inputTypes as &$inputType) {
+        if (!isset($inputType['module']) && isset($inputType['template']) && str_starts_with($inputType['template'], '~/')) {
+          [, $moduleName] = explode('/', $inputType['template']);
+          $inputType['module'] = $moduleName;
+        }
+        if (!isset($inputType['admin_module']) && isset($inputType['admin_template']) && str_starts_with($inputType['admin_template'], '~/')) {
+          [, $moduleName] = explode('/', $inputType['admin_template']);
+          $inputType['admin_module'] = $moduleName;
+        }
+      }
+
+      \Civi::cache('metadata')->set('afform.input_types', $inputTypes);
+    }
+    return $inputTypes;
   }
 
   public static function shouldReconcileManaged(array $updatedAfform, array $originalAfform = []): bool {
