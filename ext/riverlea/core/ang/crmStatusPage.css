@@ -85,3 +85,6 @@
 .status-debug-information {
   font-size: var(--crm-font-small-size);
 }
+#crm-status-list .crm-status-item .crm-buttons {
+  margin-top: var(--crm-flex-gap, 0.5rem);
+}
