@@ -169,6 +169,17 @@ class Afform extends AutoService implements EventSubscriberInterface {
 
   public function onAlterAngularModules(GenericHookEvent $e): void {
     if (!$this->isActive()) {
+      // if afform contributions is disabled we de-register afCheckout
+      unset($e->angularModules['afCheckout']);
+
+      // also deregister any modules which depend on it (which will come from integrations, e.g. afStripe, afPaypal)
+      // NOTE: if another module registers a dependency on afStripe it might crash. we dont expect that to happen
+      // and in the long run this should be removed, so not worth handling that case
+      foreach ($e->angularModules as $name => $module) {
+        if (in_array('afCheckout', $module['requires'] ?? [])) {
+          unset($e->angularModules[$name]);
+        }
+      }
       return;
     }
 
