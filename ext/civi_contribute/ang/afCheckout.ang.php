@@ -1,9 +1,5 @@
 <?php
 
-if (!\Civi::settings()->get('contribute_enable_afform_contributions')) {
-  return [];
-}
-
 // Angular module afCheckout.
 // @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
 return [
