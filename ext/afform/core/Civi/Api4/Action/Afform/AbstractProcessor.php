@@ -635,6 +635,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $item = array_merge(($val ?? []), $idData);
           $combined[$name][$idx] = $item;
         }
+        else {
+          $combined[$name][$idx] = $val;
+        }
       }
     }
     return $combined;

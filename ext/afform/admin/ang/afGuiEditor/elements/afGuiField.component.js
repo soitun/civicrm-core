@@ -68,7 +68,7 @@
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
         }
-        this.isMultiFieldFilter = ctrl.node.name.includes(',');
+        this.isMultiFieldFilter = ctrl.node.name?.includes(',');
       };
 
       this.getFkEntity = function() {
@@ -113,11 +113,15 @@
 
       // Returns the original field definition from metadata
       this.getDefn = function() {
-        let defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.getFieldName()), ctrl.getFieldName());
-        // Calc fields are specific to a search display, not part of the schema
-        if (!defn && ctrl.container.getSearchDisplay()) {
-          const searchDisplay = ctrl.container.getSearchDisplay();
-          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.getFieldName()});
+        const fieldName = ctrl.getFieldName();
+        let defn;
+        if (fieldName) {
+          defn = afGui.getField(ctrl.container.getFieldEntityType(fieldName), fieldName);
+          // Calc fields are specific to a search display, not part of the schema
+          if (!defn && ctrl.container.getSearchDisplay()) {
+            const searchDisplay = ctrl.container.getSearchDisplay();
+            defn = _.findWhere(searchDisplay.calc_fields, {name: fieldName});
+          }
         }
         defn = defn || {
           label: ts('Untitled'),
@@ -131,15 +135,21 @@
 
       this.getFieldName = function() {
         // Search filters can contain multiple field names joined by a comma. Return the first as the primary.
-        return ctrl.node.name.split(',')[0];
+        return ctrl.node.name?.split(',')[0];
       };
 
       // Get the api entity this field belongs to
       this.getEntity = function() {
-        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.getFieldName()));
+        const fieldName = ctrl.getFieldName();
+        return fieldName ? afGui.getEntity(ctrl.container.getFieldEntityType(fieldName)) : null;
       };
 
       $scope.getOriginalLabel = function() {
+        // Generic (non-entity) field
+        if (!ctrl.node.name) {
+          const genericField = afGui.meta.inputTypes.find((field) => field.name === ctrl.node.defn?.input_type);
+          return genericField ? ts('Extra %1', {1: genericField.label}) : ts('Extra Field');
+        }
         // Use afform entity if available (e.g. "Individual1")
         if (ctrl.container.getEntityName()) {
           return ctrl.editor.getEntity(ctrl.container.getEntityName()).label + ': ' + ctrl.getDefn().label;

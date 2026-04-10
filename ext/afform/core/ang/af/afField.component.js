@@ -3,7 +3,8 @@
   // Example usage: <div af-fieldset="myModel"><af-field name="do_not_email" /></div>
   angular.module('af').component('afField', {
     require: {
-      afFieldset: '^^afFieldset',
+      afForm: '?^^afForm',
+      afFieldset: '?^^afFieldset',
       afJoin: '?^^afJoin',
       afRepeatItem: '?^^afRepeatItem'
     },
@@ -19,13 +20,22 @@
       let namePrefix = '';
       // Either defn.options or chain select options loaded on-the-fly
       let fieldOptions = null;
+      // "extra" fields do not belong to any entity.
+      let isExtra = false;
 
       // Attributes for each of the low & high date fields when using search_range
       this.inputAttrs = [];
 
       this.$onInit = () => {
-        const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
-        $scope.dataProvider = closestController.is('[af-repeat-item]') ? this.afRepeatItem : this.afJoin || this.afFieldset;
+        // "extra" fields initially have no fieldName
+        if (!this.fieldName) {
+          isExtra = true;
+          $scope.dataProvider = this.afForm;
+          this.fieldName = this.defn.name;
+        } else {
+          const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
+          $scope.dataProvider = closestController.is('[af-repeat-item]') ? this.afRepeatItem : this.afJoin || this.afFieldset;
+        }
         $scope.fieldId = _.kebabCase(this.fieldName) + '-' + afFieldId++;
 
         $element.addClass('af-field-type-' + _.kebabCase(this.defn.input_type));
@@ -160,10 +170,10 @@
             return;
           }
           // Unique field name = entity_name index . join . field_name
-          const entityName = ctrl.afFieldset.getName();
-          const joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null;
+          const entityName = ctrl.afFieldset?.getName();
+          const joinEntity = ctrl.afJoin?.entity;
           let uniquePrefix = '';
-          if (entityName) {
+          if (!isExtra && entityName) {
             const index = ctrl.getEntityIndex();
             uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
           }
@@ -175,14 +185,14 @@
           else if (ctrl.fieldName in routeParams) {
             setValue(routeParams[ctrl.fieldName]);
           }
-          else if (routeParams._s) {
+          else if (!isExtra && routeParams._s) {
             setValue(ctrl.afFieldset.getSearchParamSetFieldValue(ctrl.fieldName));
           }
         }
 
         function initializeValue(firstLoad) {
           // Set default value if specified. Note that setValueFromUrl() will override this.
-          if (firstLoad && ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
+          if (firstLoad && ctrl.afFieldset?.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
           // Set default value based on field defn
@@ -312,7 +322,7 @@
       };
 
       ctrl.isReadonly = function() {
-        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill && !ctrl.afJoin) {
+        if (!isExtra && ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill && !ctrl.afJoin) {
           return ctrl.afFieldset.getEntity().actions[ctrl.defn.input_attrs.autofill] === false;
         }
         // TODO: Not actually used, but could be used if we wanted to render displayOnly
@@ -392,9 +402,9 @@
       };
 
       ctrl.getAutocompleteParams = function() {
-        let fieldName = ctrl.afFieldset.getName();
+        let fieldName = isExtra ? 'extra' : ctrl.afFieldset.getName();
         // Append join name which will be unpacked by AfformAutocompleteSubscriber::processAfformAutocomplete
-        if (ctrl.afJoin) {
+        if (!isExtra && ctrl.afJoin) {
           fieldName += '+' + ctrl.afJoin.entity;
         }
         fieldName += ':' + ctrl.fieldName;

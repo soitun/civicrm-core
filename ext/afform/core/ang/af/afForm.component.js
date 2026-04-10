@@ -527,6 +527,11 @@
         });
       }
 
+      // Used by "extra" afFields that have no entity.
+      this.getFieldData = () => {
+        return data.extra;
+      };
+
     }
   });
 })(angular, CRM.$, CRM._);
