@@ -28,6 +28,10 @@
   font-size: var(--crm-font-size);
 }
 
+.crm-search-display .crm-search-field-show-linebreaks .crm-search-field-value {
+  white-space: pre-line;
+}
+
 /* Loading placeholders */
 .crm-search-loading-placeholder {
   height: 2em;
