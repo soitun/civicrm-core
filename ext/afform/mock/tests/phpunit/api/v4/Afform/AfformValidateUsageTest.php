@@ -86,4 +86,118 @@ EOHTML;
       ->execute();
   }
 
+  public function testSubmitWithMinMaxValidation(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true}" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="external_identifier" defn="{input_type: 'Number', input_attrs: {min: 10, max: 100}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Submit with value below minimum. Should get validation error.
+    $submission = [
+      ['fields' => ['external_identifier' => 5]],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $msg = $e->getMessage();
+      $this->assertStringContainsString('External', $msg);
+      $this->assertStringContainsString('to 10', $msg);
+    }
+
+    // Submit with value above maximum. Should get validation error.
+    $submission = [
+      ['fields' => ['external_identifier' => 150]],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $msg = $e->getMessage();
+      $this->assertStringContainsString('External', $msg);
+      $this->assertStringContainsString('to 100', $msg);
+    }
+
+    // Submit with valid value. Should succeed.
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => [['fields' => ['external_identifier' => 50]]]])
+      ->execute();
+  }
+
+  public function testSubmitWithMultiselectMinMaxValidation(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Participant" name="Participant1" label="Participant 1" actions="{create: true}" security="RBAC"  />
+  <fieldset af-fieldset="Participant1" class="af-container" af-title="Participant 1">
+    <af-field name="role_id" defn="{input_attrs: {min: 2, max: 3}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Submit with fewer selections than minimum. Should get validation error.
+    $submission = [
+      ['fields' => ['role_id' => [1]]],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Participant1' => $submission])
+        ->execute();
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $msg = $e->getMessage();
+      $this->assertStringContainsString('Participant Role', $msg);
+      $this->assertStringContainsString('at least 2', $msg);
+    }
+
+    // Submit with more selections than maximum. Should get validation error.
+    $submission = [
+      ['fields' => ['role_id' => [1, 2, 3, 4]]],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Participant1' => $submission])
+        ->execute();
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $msg = $e->getMessage();
+      $this->assertStringContainsString('Participant Role', $msg);
+      $this->assertStringContainsString('at most 3', $msg);
+    }
+
+    // Submit with valid number of selections. Should succeed.
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Participant1' => [['fields' => ['role_id' => [1, 2]]]]])
+      ->execute();
+  }
+
 }

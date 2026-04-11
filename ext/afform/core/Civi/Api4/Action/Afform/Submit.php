@@ -251,7 +251,8 @@ class Submit extends AbstractProcessor {
    */
   private static function getFieldInputError(AfformValidateEvent $event, string $fieldName, array $fieldDefn, array $attributes, $value) {
     return self::getRequiredFieldError($event, $fieldName, $fieldDefn, $attributes, $value) ??
-      self::getMaxlengthError($fieldName, $fieldDefn, $value);
+      self::getMaxlengthError($fieldName, $fieldDefn, $value) ??
+      self::getMinMaxError($fieldName, $fieldDefn, $value);
   }
 
   /**
@@ -307,6 +308,48 @@ class Submit extends AbstractProcessor {
       $label = $fieldDefn['label'] ?? $fieldDefn['title'] ?? $fieldName;
       return E::ts('%1 has a max length of %2.', [1 => $label, 2 => $maxlength]);
     }
+  }
+
+  /**
+   * If value is outside of min/max constraints, return an error message.
+   */
+  private static function getMinMaxError(string $fieldName, array $fieldDefn, $value) {
+    // If we have no value, no need to check maxlength (`required` has already been checked)
+    if (!$value) {
+      return NULL;
+    }
+
+    $min = $fieldDefn['input_attrs']['min'] ?? NULL;
+    $max = $fieldDefn['input_attrs']['max'] ?? NULL;
+
+    if (!isset($min) && !isset($max)) {
+      return NULL;
+    }
+
+    $label = $fieldDefn['label'] ?? $fieldDefn['title'] ?? $fieldName;
+    $inputType = $fieldDefn['input_type'] ?? '';
+    $dataType = $fieldDefn['data_type'] ?? '';
+
+    if (is_array($value)) {
+      $count = count($value);
+      if (($inputType === 'CheckBox' || ($inputType === 'Select' && !empty($fieldDefn['input_attrs']['multiple'])))) {
+        if (isset($min) && $count < $min) {
+          return E::ts('%1 must have at least %2 selected.', [1 => $label, 2 => $min]);
+        }
+        if (isset($max) && $count > $max) {
+          return E::ts('%1 must have at most %2 selected.', [1 => $label, 2 => $max]);
+        }
+      }
+    }
+    elseif ($inputType === 'Number' || in_array($dataType, ['Integer', 'Float', 'Money'], TRUE)) {
+      if (isset($min) && $value < $min) {
+        return E::ts('%1 must be greater than or equal to %2.', [1 => $label, 2 => $min]);
+      }
+      if (isset($max) && $value > $max) {
+        return E::ts('%1 must be less than or equal to %2.', [1 => $label, 2 => $max]);
+      }
+    }
+
   }
 
   /**

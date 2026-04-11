@@ -150,9 +150,10 @@
 
       $scope.hasOptions = function() {
         const inputType = $scope.getProp('input_type');
-        if (inputType === 'Range' && ctrl.getDefn().data_type === 'Boolean') {
+        if (inputType === 'Range' && ctrl.getOptions()) {
+          return true;
         }
-        return _.contains(['CheckBox', 'Toggle', 'Radio', 'Select'], inputType) &&
+        return ['CheckBox', 'Toggle', 'Radio', 'Select'].includes(inputType) &&
           !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
 
@@ -338,10 +339,10 @@
         getSet('help_' + position, $scope.propIsset('help_' + position) ? null : (ctrl.getDefn()['help_' + position] || ts('Enter text')));
       };
 
-      function defaultValueShouldBeArray() {
+      this.isMultiSelect = () => {
         return ($scope.getProp('data_type') !== 'Boolean' &&
           ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_type') === 'Toggle' || $scope.getProp('input_attrs.multiple')));
-      }
+      };
 
       function setFieldDefn() {
         // Deeply merge defn to include nested settings e.g. `input_attrs.time`.
@@ -441,7 +442,7 @@
       };
 
       $scope.toggleDefaultValueItem = function(val) {
-        if (defaultValueShouldBeArray()) {
+        if (ctrl.isMultiSelect()) {
           if (!Array.isArray(getSet('afform_default'))) {
             ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
@@ -523,9 +524,9 @@
           // When changing the multiple property, force-reset the default value widget
           if (ctrl.hasDefaultValue && _.includes(['input_type', 'input_attrs.multiple'], propName)) {
             ctrl.hasDefaultValue = false;
-            if (!defaultValueShouldBeArray() && Array.isArray(getSet('afform_default'))) {
+            if (!ctrl.isMultiSelect() && Array.isArray(getSet('afform_default'))) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default[0];
-            } else if (defaultValueShouldBeArray() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
+            } else if (ctrl.isMultiSelect() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default.split(',');
             }
             $timeout(function() {

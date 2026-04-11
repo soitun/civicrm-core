@@ -18,11 +18,18 @@
     <input id="{{:: $ctrl.getFieldName() }}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
   </form>
 </li>
-<li ng-if="($ctrl.fieldDefn.input_type === 'Number' || $ctrl.fieldDefn.input_type === 'Range') && !hasOptions()">
+<li ng-if="$ctrl.isMultiSelect() || $ctrl.fieldDefn.input_type === 'Number' || ($ctrl.fieldDefn.input_type === 'Range' && !hasOptions())">
   <div ng-click="$event.stopPropagation()" class="form-inline">
-    <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.min" ng-change="$ctrl.onChangeMin()" title="{{:: ts('Minimum value') }}" placeholder="{{:: ts('Min') }}">
-    -
-    <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.max" ng-change="$ctrl.onChangeMax()" title="{{:: ts('Maximum value') }}" placeholder="{{:: ts('Max') }}">
+    <label>
+      {{:: ts('Minimum:') }}
+      <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.min" ng-change="$ctrl.onChangeMin()" >
+    </label>
+  </div>
+  <div ng-click="$event.stopPropagation()" class="form-inline">
+    <label>
+      {{:: ts('Maximum:') }}
+      <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.max" ng-change="$ctrl.onChangeMax()" >
+    </label>
   </div>
 </li>
 <li ng-if="['Number', 'Range'].includes($ctrl.fieldDefn.input_type) && ['Float', 'Money'].includes($ctrl.fieldDefn.data_type) && !hasOptions()">
