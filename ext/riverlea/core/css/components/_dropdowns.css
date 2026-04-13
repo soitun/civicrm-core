@@ -396,9 +396,6 @@
   right: 0;
   left: unset;
 }
-.crm-container .dropdown-menu li input {
-  width: -moz-available;
-}
 @media (min-width: 768px) {
   .crm-container .navbar-right .dropdown-menu {
     right: 0;
