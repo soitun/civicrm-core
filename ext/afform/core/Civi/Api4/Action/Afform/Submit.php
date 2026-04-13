@@ -333,19 +333,25 @@ class Submit extends AbstractProcessor {
     if (is_array($value)) {
       $count = count($value);
       if (($inputType === 'CheckBox' || ($inputType === 'Select' && !empty($fieldDefn['input_attrs']['multiple'])))) {
-        if (isset($min) && $count < $min) {
+        if (isset($min, $max) && $min === $max && $count !== $min) {
+          return E::ts('%1 must have exactly %2 selected.', [1 => $label, 2 => $min]);
+        }
+        elseif (isset($min) && $count < $min) {
           return E::ts('%1 must have at least %2 selected.', [1 => $label, 2 => $min]);
         }
-        if (isset($max) && $count > $max) {
+        elseif (isset($max) && $count > $max) {
           return E::ts('%1 must have at most %2 selected.', [1 => $label, 2 => $max]);
         }
       }
     }
     elseif ($inputType === 'Number' || in_array($dataType, ['Integer', 'Float', 'Money'], TRUE)) {
-      if (isset($min) && $value < $min) {
+      if (isset($min, $max) && $min === $max && $value != $min) {
+        return E::ts('%1 must be equal to %2.', [1 => $label, 2 => $min]);
+      }
+      elseif (isset($min) && $value < $min) {
         return E::ts('%1 must be greater than or equal to %2.', [1 => $label, 2 => $min]);
       }
-      if (isset($max) && $value > $max) {
+      elseif (isset($max) && $value > $max) {
         return E::ts('%1 must be less than or equal to %2.', [1 => $label, 2 => $max]);
       }
     }

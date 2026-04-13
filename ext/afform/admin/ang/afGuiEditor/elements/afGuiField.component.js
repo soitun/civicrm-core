@@ -560,19 +560,19 @@
         return searchJoins;
       };
 
-      // When changing min, keep it under max.
+      // When changing min, keep it greater than or equal to max.
       this.onChangeMin = () => {
         const max = $scope.getProp('input_attrs.max');
-        if (typeof max !== 'undefined' && max <= ctrl.node.defn.input_attrs.min) {
-          ctrl.node.defn.input_attrs.min = ctrl.node.defn.input_attrs.max - 1;
+        if (typeof max !== 'undefined' && max < ctrl.node.defn.input_attrs.min) {
+          ctrl.node.defn.input_attrs.min = ctrl.node.defn.input_attrs.max;
         }
       };
 
-      // When changing max, keep it over min.
+      // When changing max, keep it less than or equal to min.
       this.onChangeMax = () => {
         const min = $scope.getProp('input_attrs.min');
-        if (typeof min !== 'undefined' && min >= ctrl.node.defn.input_attrs.max) {
-          ctrl.node.defn.input_attrs.max = ctrl.node.defn.input_attrs.min + 1;
+        if (typeof min !== 'undefined' && min > ctrl.node.defn.input_attrs.max) {
+          ctrl.node.defn.input_attrs.max = ctrl.node.defn.input_attrs.min;
         }
       };
 
