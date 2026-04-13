@@ -187,7 +187,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 .crm-container table.report td {
   border: var(--crm-table-row-border);
-  background-color: var(--crm-table-alternate-row);
+  background-color: var(--crm-table-row-bg-color);
 }
 .crm-container tr.columnheader-dark th {
   background-color: var(--crm-primary-color);
