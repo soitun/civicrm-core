@@ -409,7 +409,7 @@
           }
           return;
         }
-        status = CRM.status({error: ts('Not saved')});
+        status = CRM.status({error: ts('Not Saved')});
         $element.block();
         if (cancelDraftWatcher) {
           cancelDraftWatcher();
