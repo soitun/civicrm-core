@@ -98,7 +98,12 @@
   padding: var(--crm-padding-reg) 0;
 }
 .crm-container .crm-summary-row.primary .crm-label:after {
-  content: ' *'; /* marks primary contact records on contact dashboard */
+  content: '\f005';
+  font-family: 'Font Awesome 5 Free';
+  opacity: 0.5;
+  font-size: 75%;
+  position: relative;
+  top: -2px;
 }
 /* Fieldset */
 .crm-container fieldset {
