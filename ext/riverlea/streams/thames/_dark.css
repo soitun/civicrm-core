@@ -47,7 +47,7 @@
   --crm-alert-warning-bg-color: #383124;
   --crm-alert-info-bg-color: var(--crm-c-blue-darker);
   --crm-alert-info-text-color: var(--crm-c-blue-light);
-/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Form '--crm-form-' '--crm-input-' */
   --crm-form-block-bg-color: var(--crm-c-dkblue-02);
   --crm-input-bg-color: var(--crm-c-blue-darker);
   --crm-input-color: var(--crm-c-blue); /* text */
