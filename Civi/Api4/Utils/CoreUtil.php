@@ -234,7 +234,7 @@ class CoreUtil {
       return [
         'extends' => [$entityName],
         'column' => 'id',
-        'grouping' => ($customGroupExtends[$entityName]['grouping'] ?: array_column(\CRM_Utils_Array::findAll($extendsSubGroups, ['extends' => $entityName]), 'grouping', 'id')) ?: NULL,
+        'grouping' => ($customGroupExtends[$entityName]['grouping'] ?: array_column(\CRM_Utils_Array::filter($extendsSubGroups, ['extends' => $entityName]), 'grouping', 'id')) ?: NULL,
       ];
     }
     return NULL;
