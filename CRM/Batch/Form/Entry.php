@@ -770,19 +770,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         // end of contribution related section
         if ($this->currentRowIsRenew()) {
-          // The following parameter setting may be obsolete.
-          $this->_params = $params;
-
           $formDates = [
             'end_date' => $value['membership_end_date'] ?? NULL,
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
 
-          $changeToday = NULL;
-          $numRenewTerms = 1;
-          $format = '%Y%m%d';
           $ids = [];
-          $isPayLater = NULL;
           $memParams = $this->getCurrentRowMembershipParams();
           $currentMembership = $this->getCurrentMembership();
 
@@ -792,9 +785,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
             // CRM-7297 Membership Upsell - calculate dates based on new membership type
             $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
-              $changeToday,
+              NULL,
               $this->getCurrentRowMembershipTypeID(),
-              $numRenewTerms
             );
 
             foreach (['start_date', 'end_date'] as $dateType) {
@@ -804,7 +796,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $ids['membership'] = $currentMembership['id'];
 
             //set the log start date.
-            $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
+            $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
           }
           else {
 
@@ -814,9 +806,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $membership->find(TRUE);
             // CRM-7297 Membership Upsell - calculate dates based on new membership type
             $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id,
-              $changeToday,
+              NULL,
               $this->getCurrentRowMembershipTypeID(),
-              $numRenewTerms
             );
 
             // Insert renewed dates for CURRENT membership
@@ -828,12 +819,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             }
 
             //set the log start date.
-            $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
+            $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
 
             if (!empty($currentMembership['id'])) {
               $ids['membership'] = $currentMembership['id'];
             }
-            $memParams['membership_activity_status'] = $isPayLater ? 'Scheduled' : 'Completed';
+            $memParams['membership_activity_status'] = 'Completed';
           }
 
           //since we are renewing,
@@ -846,16 +837,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           // $ids['membership'] is the "current membership ID"
           $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
 
-          // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
-          // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
-          $membership->find(TRUE);
-
           // make contribution entry
-          $contrbutionParams = array_merge($value, ['membership_id' => $membership->id]);
-          $contrbutionParams['skipCleanMoney'] = TRUE;
+          $contributionParams = array_merge($value, ['membership_id' => $membership->id]);
+          $contributionParams['skipCleanMoney'] = TRUE;
           // @todo - calling this from here is pretty hacky since it is called from membership.create anyway
           // This form should set the correct params & not call this fn directly.
-          CRM_Member_BAO_Membership::recordMembershipContribution($contrbutionParams);
+          CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
           $this->setCurrentRowMembershipID($membership->id);
         }
         else {
