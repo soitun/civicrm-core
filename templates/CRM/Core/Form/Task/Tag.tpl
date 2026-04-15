@@ -7,11 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* template to remove tags from activity  *}
-<div class="crm-form-block crm-block crm-activity-task-removefromtag-form-block">
-<h3>{ts}Tag Activities (Remove){/ts}</h3>
-<table class="form-layout-compressed">
-    <tr class="crm-activity-task-removefromtag-form-block-tag">
+<div class="crm-form-block crm-block crm-task-addtotag-form-block">
+  <table class="form-layout-compressed">
+    <tr class="crm-task-addtotag-form-block-tag">
         <td>
           {$form.tag.label}
           {$form.tag.html}
@@ -22,7 +20,7 @@
             {include file="CRM/common/Tagset.tpl"}
         </td>
     </tr>
-    <tr><td>{include file="CRM/Activity/Form/Task.tpl"}</td></tr>
-</table>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+    <tr><td>{include file=$parentTemplate}</td></tr>
+  </table>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
