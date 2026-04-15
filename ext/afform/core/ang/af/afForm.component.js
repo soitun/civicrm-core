@@ -320,6 +320,9 @@
         const metaData = ctrl.getFormMeta(),
           dialog = $element.closest('.ui-dialog-content');
 
+        // reset form to clean
+        ctrl.ngForm.$setPristine();
+
         $element.trigger('crmFormSuccess', {
           afform: metaData,
           data: data,
