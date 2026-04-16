@@ -17,7 +17,6 @@
         data = {extra: {}};
 
       let
-        status,
         args,
         submissionResponse,
         // Default autosave function does nothing
@@ -146,14 +145,25 @@
       this.fileUploader = new FileUploader({
         url: CRM.url('civicrm/ajax/api4/Afform/submitFile'),
         headers: headers,
-        onAfterAddingFile: function(item) {
+        onAfterAddingFile: (item) => {
           setDraftStatus('unsaved');
         },
         onSuccessItem: onFileUploadSuccess,
         onCompleteAll: onFileUploadsComplete,
-        onBeforeUploadItem: function(item) {
-          status.resolve();
-          status = CRM.status({start: ts('Uploading %1', {1: item.file.name})});
+        onBeforeUploadItem: (item) => {
+          // Show unobtrusive status indicator.
+          item._status = CRM.status({
+            start: ts('Uploading %1', {1: item.file.name}),
+            error: ts('Upload failed'),
+            success: ts('Upload complete'),
+          });
+        },
+        onCompleteItem: (item, response, status, headers) => {
+          if (status === 200) {
+            item._status.resolve();
+          } else {
+            item._status.reject();
+          }
         }
       });
 
@@ -172,7 +182,6 @@
           if (draftStatus === 'unsaved') {
             autoSave();
           }
-          status.resolve();
         } else {
           postProcess();
         }
@@ -342,8 +351,6 @@
           return;
         }
 
-        status.resolve();
-
         if (submissionResponse[0].message) {
           $element.hide();
           const $confirmation = $('<div class="afform-confirmation" />');
@@ -412,13 +419,12 @@
           }
           return;
         }
-        status = CRM.status({error: ts('Not Saved')});
         $element.block();
         if (cancelDraftWatcher) {
           cancelDraftWatcher();
         }
 
-        crmApi4('Afform', 'submit', {
+        const submitApi = crmApi4('Afform', 'submit', {
           name: ctrl.getFormMeta().name,
           args: args,
           values: data,
@@ -440,7 +446,6 @@
           }
         })
         .catch(function(error) {
-          status.reject();
           $element.unblock();
 
           handleError(error);
@@ -452,6 +457,11 @@
             error: error
           });
         });
+        // Show unobtrusive status indicator.
+        crmStatus({
+          // Defaults for `start` and `success` are 'Saving...' and 'Saved' .
+          error: ts('Not Saved'),
+        }, submitApi);
       };
 
       this.submitDraft = function() {
@@ -459,16 +469,14 @@
           return;
         }
         setDraftStatus('saving');
-        status = CRM.status({start: ts('Saving Draft'), success: ts('Draft saved')});
-        crmApi4('Afform', 'submitDraft', {
+        const submitDraft = crmApi4('Afform', 'submitDraft', {
           name: ctrl.getFormMeta().name,
           args: args,
           values: data,
         }).then(function(response) {
-          status.resolve();
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             uploadingDraftFiles = true;
-            _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
+            ctrl.fileUploader.getNotUploadedItems().forEach((file) => {
               file.formData.push({
                 params: JSON.stringify(_.extend({
                   name: ctrl.getFormMeta().name
@@ -484,6 +492,12 @@
           setDraftStatus('unsaved');
           handleError(error);
         });
+        // Show unobtrusive status indicator.
+        crmStatus({
+          start: ts('Saving Draft'),
+          success: ts('Draft Saved'),
+          error: ts('Not Saved'),
+        }, submitDraft);
       };
 
       function getDraftButtons() {
