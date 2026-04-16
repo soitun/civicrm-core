@@ -352,6 +352,10 @@ class CRM_Core_BAO_CustomQuery {
               $this->_qill[$grouping][] = $field['label'] . " {$qillOp} ";
             }
             break;
+
+          default:
+            \Civi::log()->debug('An unknown custom field data type has been used: ' . $field['data_type'] . '. Please report this issue on https://lab.civicrm.org/dev/core');
+
         }
       }
     }
