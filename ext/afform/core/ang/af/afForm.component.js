@@ -535,6 +535,29 @@
         return data.extra;
       };
 
+      // these tokens matching/replacing functions should match
+      // the serverside implementation in AbstractProcessor::replaceTokens
+      this.identifyTokens = (message) => message?.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g);
+
+      this.getTokenValues = (tokens) => {
+        const values = {};
+
+        tokens.forEach((token) => {
+          const parts = token.slice(1, -1).split('.');
+          values[token] = data[parts[0]][parts[1]].fields[parts.slice(2).join('.')];
+          values[token] = (values[token] === undefined) ? '' : values[token];
+        });
+
+        return values;
+      };
+
+      this.replaceTokens = (message) => {
+        const tokens = this.identifyTokens(message);
+        const tokenValues = this.getTokenValues(tokens);
+        tokens.forEach((token) => message = message.replace(token, tokenValues[token]));
+        return message;
+      };
+
     }
   });
 })(angular, CRM.$, CRM._);

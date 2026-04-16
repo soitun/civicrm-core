@@ -92,6 +92,17 @@
           }, true);
         }
 
+        // check for tokens in the default value
+        if (this.defn.afform_default) {
+          const tokens = this.afForm.identifyTokens(this.defn.afform_default);
+          if (tokens.length) {
+            $scope.$watchCollection(() => Object.values(this.afForm.getTokenValues(tokens)), () => {
+              const calculatedValue = this.afForm.replaceTokens(this.defn.afform_default);
+              setValue(calculatedValue);
+            });
+          }
+        }
+
         // ChainSelect - watch control field & reload options as needed
         if (this.defn.input_type === 'ChainSelect' && this.defn.input_attrs.control_field) {
           const controlField = namePrefix + this.defn.input_attrs.control_field;
