@@ -1,4 +1,4 @@
-<li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
+<li ng-if="$ctrl.node.name && (!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill)">
   <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Type:') }}</label>
     <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">

@@ -105,6 +105,9 @@ class Utils {
         ],
         'Email' => [
           'label' => E::ts('Email'),
+          'extra_defn' => [
+            'data_type' => 'String',
+          ],
         ],
         'EntityRef' => [
           'label' => E::ts('Autocomplete Entity'),
@@ -120,6 +123,9 @@ class Utils {
         ],
         'Number' => [
           'label' => E::ts('Number'),
+          'extra_defn' => [
+            'data_type' => 'Integer',
+          ],
         ],
         'Radio' => [
           'label' => E::ts('Radio Buttons'),
@@ -135,15 +141,27 @@ class Utils {
         ],
         'Text' => [
           'label' => E::ts('Single-Line Text'),
+          'extra_defn' => [
+            'data_type' => 'String',
+          ],
         ],
         'TextArea' => [
           'label' => E::ts('Multi-Line Text'),
+          'extra_defn' => [
+            'data_type' => 'String',
+          ],
         ],
         'Toggle' => [
           'label' => E::ts('Toggle Switch'),
+          'extra_defn' => [
+            'data_type' => 'Boolean',
+          ],
         ],
         'Url' => [
           'label' => E::ts('URL'),
+          'extra_defn' => [
+            'data_type' => 'String',
+          ],
         ],
       ];
       // Input types shipped with Afform all follow this template file name convention,
