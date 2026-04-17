@@ -1928,7 +1928,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addRadio($name, $label, $options, $props, NULL, $required);
 
       case 'CheckBox':
-        if ($context === 'search') {
+        // Ex: for is_deceased, but not is_deleted (usually implicit)
+        if ($context === 'search' && !in_array($name, ['case_deleted', 'is_deleted'])) {
           $this->addYesNo($name, $label, TRUE, FALSE, $props);
           return;
         }
