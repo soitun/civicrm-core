@@ -4,7 +4,8 @@
   angular.module('afGuiEditor').component('afGuiTokenSelect', {
     bindings: {
       model: '<',
-      field: '@'
+      field: '@',
+      noSubmissionTokens: '@',
     },
     require: {
       editor: '^afGuiEditor'
@@ -53,7 +54,7 @@
         ctrl.editor.getEntities().forEach((entity) => {
           const entityTokens = [];
           const entityMeta = ctrl.editor.meta.entities[entity.type];
-          if (entityMeta.submissionTokens) {
+          if (entityMeta.submissionTokens && !ctrl.noSubmissionTokens) {
             // Explicitly defined submission tokens e.g. by FormProcessor extension
             entityMeta.submissionTokens.forEach((submissionToken) => {
               entityTokens.push({
@@ -62,12 +63,14 @@
                 description: submissionToken.description ?? '',
               });
             });
-          } else {
+          } else if (!entityMeta.submissionTokens) {
             // Primary key token
-            entityTokens.push({
-              id: entity.name + '.0.id',
-              text: ts('%1 ID', {1: entity.label}),
-            });
+            if (!ctrl.noSubmissionTokens) {
+              entityTokens.push({
+                id: entity.name + '.0.id',
+                text: ts('%1 ID', {1: entity.label}),
+              });
+            }
             // Tokens from entity data values
             if (entity.data) {
               Object.keys(entity.data).forEach((key) => {
@@ -94,12 +97,14 @@
             });
           }
         });
-        allTokens.push({
-          text: ts('Form'),
-          children: [
-            {id: 'token', text: ts('Submission JWT')},
-          ],
-        });
+        if (!ctrl.noSubmissionTokens) {
+          allTokens.push({
+            text: ts('Form'),
+            children: [
+              {id: 'token', text: ts('Submission JWT')},
+            ],
+          });
+        }
         return {
           results: allTokens
         };

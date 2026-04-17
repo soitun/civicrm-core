@@ -381,7 +381,7 @@
         return ctrl.hasDefaultValue && ctrl.getDefn().data_type !== 'Boolean' && ctrl.defaultDateType() === 'fixed';
       };
 
-      this.allowTokensInDefault = () => ['Text', 'TextArea', 'Hidden', 'DisplayOnly'].includes(this.fieldDefn.input_type);
+      this.allowTokensInDefault = () => this.editor.getFormType() === 'form' && ['Text', 'TextArea', 'Hidden', 'DisplayOnly'].includes(this.fieldDefn.input_type);
 
       this.defaultDateType = function(newValue) {
         if (arguments.length) {

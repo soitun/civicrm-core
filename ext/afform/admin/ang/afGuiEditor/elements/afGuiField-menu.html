@@ -111,7 +111,7 @@
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
     <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" op="$ctrl.isSearch() ? (getSetOperator() || 'IN') : null">
   </form>
-  <af-gui-token-select class="input-group-addon" model="getSet" field="afform_default" ng-if="$ctrl.allowTokensInDefault()"></af-gui-token-select>
+  <af-gui-token-select class="input-group-addon" model="getSet" field="afform_default" ng-if="$ctrl.allowTokensInDefault()" no-submission-tokens="true"></af-gui-token-select>
 </li>
 <li>
   <a href ng-click="toggleLabel(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show field label') }}">
