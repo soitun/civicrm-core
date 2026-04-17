@@ -21,8 +21,31 @@
         });
       };
 
-      this.insertToken = function(key) {
-        ctrl.model[ctrl.field] = (ctrl.model[ctrl.field] || '') + '[' + key + ']';
+      this.insertToken = (key) => {
+        const token = '[' + key + ']';
+        let value = getModelValue();
+        if (value.length) {
+          value += ' ';
+        }
+        value += token;
+        setModelValue(value);
+      };
+
+      const getModelValue = () => {
+        // If using getter/setter factory
+        if (typeof this.model === 'function') {
+          return this.model(this.field)() || '';
+        }
+        return this.model[this.field] || '';
+      };
+
+      const setModelValue = (value) => {
+        // If using getter/setter factory
+        if (typeof this.model === 'function') {
+          this.model(this.field)(value);
+        } else {
+          this.model[this.field] = value;
+        }
       };
 
       this.getTokens = function() {
