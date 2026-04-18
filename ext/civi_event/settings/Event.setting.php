@@ -41,7 +41,7 @@ return [
     'settings_pages' => ['event' => ['weight' => 90]],
     'type' => 'Boolean',
     'default' => FALSE,
-    'add' => '6.10',
+    'add' => '6.15',
     'title' => ts('Show Price-Fields during Initial Registrations to be Approved?'),
     'html_type' => 'checkbox',
     'is_domain' => 1,
