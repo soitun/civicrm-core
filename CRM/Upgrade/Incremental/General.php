@@ -156,9 +156,6 @@ class CRM_Upgrade_Incremental_General {
    * @param $fromVer version we are upgrading from
    */
   public static function updateMessageTemplate(&$message, $version, $fromVer) {
-    if (version_compare($version, 5.0, '<')) {
-      return;
-    }
     $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
     $messages = $messageObj->getUpgradeMessages($fromVer);
     if (empty($messages)) {
