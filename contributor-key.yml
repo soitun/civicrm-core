@@ -178,6 +178,10 @@
 - github      : artem3
   name        : Artem Goncharenko
 
+- github      : ArthegaAsdweri
+  name        : Daniel Hahn
+  organization: SYSTOPIA
+
 - github      : arthuralmeidap
   name        : Arthur Almeida
   organization: Neuwald Tecnologia da Informação
@@ -261,10 +265,10 @@
 - github      : braders
   name        : Bradley Taylor
   organization: BrightMinded Ltd
-  
+
 - github      : brendt
   name        : Brent Roose
-  
+
 - name        : Brian McFee
 
 - github      : breheret
