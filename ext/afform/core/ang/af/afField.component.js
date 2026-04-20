@@ -92,6 +92,20 @@
           }, true);
         }
 
+        // check for tokens in the default value
+        const tokens = this.afForm.identifyTokens(this.defn.afform_default);
+        if (tokens && tokens.length) {
+          const calculateValueWatcher = $scope.$watchCollection(() => Object.values(this.afForm.getTokenValues(tokens)), () => {
+            if ($element[0].querySelector('.ng-touched')) {
+              // user has touched this input, stop calculating
+              calculateValueWatcher();
+              return;
+            }
+            const calculatedValue = this.afForm.replaceTokens(this.defn.afform_default);
+            setValue(calculatedValue);
+          });
+        }
+
         // ChainSelect - watch control field & reload options as needed
         if (this.defn.input_type === 'ChainSelect' && this.defn.input_attrs.control_field) {
           const controlField = namePrefix + this.defn.input_attrs.control_field;
@@ -197,7 +211,12 @@
           }
           // Set default value based on field defn
           else if ('afform_default' in ctrl.defn) {
-            setValue(ctrl.defn.afform_default);
+            if (ctrl.afForm.identifyTokens(ctrl.defn.afform_default)) {
+              setValue(ctrl.afForm.replaceTokens(ctrl.defn.afform_default));
+            }
+            else {
+              setValue(ctrl.defn.afform_default);
+            }
           }
 
           if (ctrl.defn.search_range) {
