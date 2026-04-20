@@ -110,6 +110,6 @@
     <li>{ts}Set to "Backend" if the form is only for users who have permission to access CiviCRM. It will use the Backend CiviCRM theme and url scheme.{/ts}</li>
   </ul>
   <p>
-    {ts}Note: choosing the "Frontend" setting doesn't automatically make this form public; you must also change the permission appropriately, e.g. to "Allow all users," and also set the "Security" option to "Form Based" for each entity.{/ts}
+    {ts}Note: choosing the "Frontend" setting doesn't automatically make the form publicly accessible; you may need to update the form "Permission" setting to "Allow all users", and switch the "Security" option for entities to "Form Based".{/ts}
   </p>
 {/htxt}
