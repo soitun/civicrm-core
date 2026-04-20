@@ -8,9 +8,12 @@
       entity: '<'
     },
     require: {editor: '^^afGuiEditor'},
-    controller: function ($scope, $timeout, afGui, formatForSelect2) {
+    controller: function ($scope, $timeout, afGui, formatForSelect2, crmUiHelp) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       const ctrl = this;
+
+      $scope.hs = crmUiHelp({file: 'CRM/AfformAdmin/afformBuilder'});
+
       $scope.controls = {};
       $scope.fieldList = [];
       $scope.blockList = [];
