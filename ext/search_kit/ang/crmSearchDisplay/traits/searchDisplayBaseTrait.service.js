@@ -148,6 +148,9 @@
           });
         }
 
+        // Trigger an event when the searchDisplay has completely (re-)loaded
+        this.onPostRun.push(() => $element[0].dispatchEvent(new Event('load')));
+
         // Set up watches to refresh search results when needed.
         // And trigger the first run of the search if appropriate.
         function setUpWatches() {
