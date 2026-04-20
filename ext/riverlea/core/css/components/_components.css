@@ -526,6 +526,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 .crm-container .label-danger[href]:focus {
   background: color-mix(in srgb, var(--crm-danger-color) 87.5%, var(--crm-ink) 12.5%);
 }
+.crm-container span.label + span.label {
+  margin-left: var(--crm-flex-gap);
+}
 
 /* Background regions */
 
