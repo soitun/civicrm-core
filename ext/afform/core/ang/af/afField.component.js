@@ -111,6 +111,7 @@
 
             if (val && (typeof val === 'number' || val.length)) {
               $('input[crm-ui-select]', $element).addClass('loading').prop('disabled', true);
+              // Keep this list of params in-sync with `PageTokenCredential::getAllowedApi4Calls`
               const params = {
                 name: ctrl.afFieldset.getFormName(),
                 modelName: ctrl.afFieldset.getName(),
