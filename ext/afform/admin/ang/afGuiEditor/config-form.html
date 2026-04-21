@@ -65,6 +65,7 @@
     <div class="form-group" ng-show="!!editor.afform.server_route">
       <label>
         {{:: ts('Frontend or backend?') }}
+        <a crm-ui-help="hs({id: 'server_route_is_public', title: ts('Frontend or backend?')})"></a>
         <div class="crm-form-toggle-container">
           <input type="checkbox" class="crm-form-toggle" ng-model="editor.afform.is_public">
           <span class="crm-form-toggle-text crm-form-toggle-text-off">{{:: ts('Backend') }}</span>

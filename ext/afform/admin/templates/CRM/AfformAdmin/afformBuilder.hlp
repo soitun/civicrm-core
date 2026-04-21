@@ -103,3 +103,13 @@
     <li>{ts}Update - Allows users to view and modify existing records.{/ts}</li>
   </ul>
 {/htxt}
+
+{htxt id='server_route_is_public'}
+  <ul>
+    <li>{ts}Set to "Frontend" if you plan to present the form on a public-facing webpage. This allows your CMS/theme to style the form to look like the rest of your website.{/ts}</li>
+    <li>{ts}Set to "Backend" if the form is only for users who have permission to access CiviCRM. It will use the Backend CiviCRM theme and url scheme.{/ts}</li>
+  </ul>
+  <p>
+    {ts}Note: choosing the "Frontend" setting doesn't automatically make the form publicly accessible; you may need to update the form "Permission" setting to "Allow all users", and switch the "Security" option for entities to "Form Based".{/ts}
+  </p>
+{/htxt}
