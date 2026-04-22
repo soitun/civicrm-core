@@ -353,7 +353,7 @@ trait DAOActionTrait {
         $field['id'],
         $customParams,
         $value,
-        $field['extends'],
+        $field['custom_group']['extends'],
         // todo check when this is needed
         NULL,
         $entityId,
@@ -374,27 +374,14 @@ trait DAOActionTrait {
    * @return array{id: int, name: string, entity: string, suffix: string, html_type: string, data_type: string, extends: string, table_name: string}|NULL
    */
   protected function getCustomFieldInfo(string $fieldExpr): ?array {
-    if (!str_contains($fieldExpr, '.')) {
-      return NULL;
+    [$fieldName, $suffix] = array_pad(explode(':', $fieldExpr), 2, NULL);
+    $field = \CRM_Core_BAO_CustomField::getFieldByName($fieldName);
+    if ($field) {
+      $field['name'] = $fieldName;
+      $field['entity'] = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($field['custom_group']['extends']);
+      $field['suffix'] = $suffix;
     }
-    [$groupName, $fieldName] = explode('.', $fieldExpr);
-    [$fieldName, $suffix] = array_pad(explode(':', $fieldName), 2, NULL);
-    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
-      if ($customGroup['name'] === $groupName) {
-        foreach ($customGroup['fields'] as $field) {
-          if ($field['name'] === $fieldName) {
-            $field['custom_field_id'] = $field['id'];
-            $field['table_name'] = $customGroup['table_name'];
-            $field['extends'] = $customGroup['extends'];
-            $field['name'] = "$groupName.$fieldName";
-            $field['entity'] = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($customGroup['extends']);
-            $field['suffix'] = $suffix;
-            return $field;
-          }
-        }
-      }
-    }
-    return NULL;
+    return $field;
   }
 
   /**
