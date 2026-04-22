@@ -338,11 +338,6 @@ trait DAOActionTrait {
         $value = '';
       }
 
-      // Uglify checkbox values for the sake of CustomField::formatCustomField()
-      if ($field['html_type'] === 'CheckBox' && is_array($value)) {
-        $value = array_fill_keys($value, TRUE);
-      }
-
       // Match contact id to strings like "user_contact_id"
       // FIXME handle arrays for multi-value contact reference fields, etc.
       if (in_array($field['data_type'], ['ContactReference', 'EntityReference']) && is_string($value)) {
@@ -359,7 +354,8 @@ trait DAOActionTrait {
         $entityId,
         FALSE,
         $this->getCheckPermissions(),
-        TRUE
+        TRUE,
+        FALSE
       );
     }
 

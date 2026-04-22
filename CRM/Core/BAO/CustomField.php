@@ -1465,6 +1465,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    *   If false, do not include permissioning clause.
    * @param bool $includeViewOnly
    *   If true, fields marked 'View Only' are included. Required for APIv3.
+   * @param bool $formatLegacyCheckboxes
+   *   If true, convert legacy html-style [value => bool] into an array of values.
    *
    * @return array|NULL
    *   formatted custom field array
@@ -1475,7 +1477,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     $entityId = NULL,
     $inline = FALSE,
     $checkPermission = TRUE,
-    $includeViewOnly = FALSE
+    $includeViewOnly = FALSE,
+    $formatLegacyCheckboxes = TRUE
   ) {
     // FIXME: The following code faithfully preserves this function's longstanding behavior of filtering group/field properties,
     // and returning NULL if the custom field does not match... But why?
@@ -1547,8 +1550,8 @@ SELECT id
       $customValueId = CRM_Core_DAO::singleValueQuery($query);
     }
 
-    //fix checkbox, now check box always submits values
-    if ($customField['html_type'] == 'CheckBox') {
+    // Convert legacy html-style [value => bool] into an array of values
+    if ($customField['html_type'] == 'CheckBox' && $formatLegacyCheckboxes) {
       // Note that only during merge this is not an array, and you can directly use value
       if (is_array($value)) {
         $selectedValues = [];
