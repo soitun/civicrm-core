@@ -165,7 +165,7 @@ function dm_install_packages() {
   local to="$2"
 
   local excludes_rsync=""
-  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents git-footnote PHP/CodeCoverage ; do
+  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents PHP/CodeCoverage ; do
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 
