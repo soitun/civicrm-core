@@ -47,8 +47,13 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals(strtolower("{$dbFieldName}_{$customFieldID}"), $dbColumnName,
       "Column name ends in ID");
 
+    // Test getShortNameFromLongName and getLongNameFromShortName functions.
     $this->assertSame('new_custom_group.testFld', CRM_Core_BAO_CustomField::getLongNameFromShortName("custom_{$customFieldID}_123"));
     $this->assertSame("custom_$customFieldID", CRM_Core_BAO_CustomField::getShortNameFromLongName('new_custom_group.testFld'));
+    $this->assertNull(CRM_Core_BAO_CustomField::getShortNameFromLongName('new_custom_group.nothing'));
+    $this->assertNull(CRM_Core_BAO_CustomField::getShortNameFromLongName('nothing.here'));
+    $this->assertNull(CRM_Core_BAO_CustomField::getLongNameFromShortName("abc_$customFieldID"));
+    $this->assertNull(CRM_Core_BAO_CustomField::getLongNameFromShortName('custom_1234567890'));
 
     $this->assertEquals('testFld', CRM_Core_BAO_CustomField::getField($customFieldID)['name']);
     $this->assertEquals($customFieldID, CRM_Core_BAO_CustomField::getFieldByName('new_custom_group.testFld')['id']);
