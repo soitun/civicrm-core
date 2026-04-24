@@ -29,6 +29,39 @@ class CRM_Upgrade_Incremental_php_SixSixteen extends CRM_Upgrade_Incremental_Bas
    */
   public function upgrade_6_16_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    $this->addTask('Add column "LineItem.created_date"', 'alterSchemaField', 'LineItem', 'created_date', [
+      'title' => ts('Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the LineItem created.'),
+      'add' => '6.16',
+      'unique_name' => 'lineitem_created_date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'label' => ts('Created Date'),
+      ],
+    ]);
+    $this->addTask('Add column "LineItem.modified_date"', 'alterSchemaField', 'LineItem', 'modified_date', [
+      'title' => ts('Modified Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the LineItem modified.'),
+      'add' => '6.16',
+      'unique_name' => 'lineitem_modified_date',
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'label' => ts('Modified Date'),
+      ],
+    ]);
   }
 
 }
