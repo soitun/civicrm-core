@@ -596,7 +596,6 @@
         tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
         return message;
       };
-
     }
   });
 })(angular, CRM.$, CRM._);
