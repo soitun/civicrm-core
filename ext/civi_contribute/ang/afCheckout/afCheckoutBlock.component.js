@@ -19,7 +19,7 @@
     templateUrl: '~/afCheckout/afCheckoutBlock.html',
     controller: function($scope, $element, crmApi4) {
 
-      const ts = $scope.ts = CRM.ts('afform_payments');
+      const ts = $scope.ts = CRM.ts('civi_contribute');
 
       this.checkout_params = {};
 
