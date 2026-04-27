@@ -1,10 +1,17 @@
 (function(angular, $, _) {
-  // Example usage: <af-form><af-entity name="Donation" type="Contribution" /> ... <fieldset af-fieldset="Donation"> <af-checkout></af-checkout> ... </fieldset></af-form>
+  // Expected usage:
+  // <af-form>
+  // <af-entity name="Donation" type="Contribution" />
+  // ...
+  // <fieldset af-fieldset="Donation">
+  //   <af-field name="checkout_option" />
+  //   <af-checkout-block />
+  //   ...
   angular.module('afCheckout').component('afCheckoutBlock', {
     require: {
       // TODO: this might be neater if we bound to the afField controller
       // and used it setValue method. but a) setValues isn't exposed method from the afField controller
-      // and b) we need to get `afform_payment_processor` field value from the afFieldset anyway
+      // and b) we need to get `checkout_option` field value from the afFieldset anyway
       // so jump straight to fieldset for now (requires Contribution isn't a join, which it definitely shouldn't be)
       afFieldset: '^^afFieldset',
       afForm: '^^afForm',
@@ -17,7 +24,7 @@
       this.checkout_params = {};
 
       // from settings factory
-      // @see \Civi\AfformPayment\AngularManager::getSettings
+      // @see \Civi\Checkout\Afform::getSettings
       const options = CRM.afCheckout.checkoutOptions;
 
       this.getCheckoutOptionKey = () => {
