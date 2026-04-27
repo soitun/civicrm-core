@@ -100,7 +100,7 @@ class AfformAdminInjector extends AutoSubscriber {
           $editMenu = <<<HTML
             <div class="btn-group crm-admin-block-context-dropdown dropup" ng-if="checkLinkPerm('{$links[0]['permission']}', {$links[0]['created_id']})">
               <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> <span class="caret"></span><span class="sr-only">{{:: ts('Configure')}}</span>
+                <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> <span class="sr-only">{{:: ts('Configure')}}</span>
               </button>
               <ul class="dropdown-menu dropdown-menu-right">$linksMarkup</ul>
             </div>
