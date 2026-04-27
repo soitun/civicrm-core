@@ -133,7 +133,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
 
     foreach ($dataModel->getEntities() as $entityName => $entity) {
       $entityType = $entity['type'];
-      $priceFields = PriceFieldUtils::getPriceFieldsForEntity($entityType);
+      $priceFields = $entityType ? PriceFieldUtils::getPriceFieldsForEntity($entityType) : NULL;
       if (!$priceFields) {
         continue;
       }
