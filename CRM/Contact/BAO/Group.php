@@ -376,6 +376,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    * @return bool
    */
   public static function setIsActive($id, $isActive) {
+    unset(Civi::$statics[__CLASS__ . '::filterActiveGroups']);
     return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Group', $id, 'is_active', $isActive);
   }
 
@@ -1316,6 +1317,7 @@ WHERE {$whereClause}";
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    unset(Civi::$statics[__CLASS__ . '::filterActiveGroups']);
     /** @var CRM_Contact_DAO_Group $group */
     $group = $event->object;
     if (in_array($event->action, ['create', 'edit'])) {
