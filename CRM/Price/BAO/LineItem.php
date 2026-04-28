@@ -157,7 +157,6 @@ WHERE li.contribution_id = %1";
    *   Array of line items
    */
   public static function getLineItems($entityId, $entity = 'participant', $isQuick = FALSE, $isQtyZero = TRUE, $relatedEntity = FALSE) {
-    $whereClause = $fromClause = NULL;
     $selectClause = '
       SELECT li.id,
       li.label,
@@ -203,7 +202,7 @@ WHERE li.contribution_id = %1";
 
     $lineItems = [];
 
-    if (!$entityId || !$entity || !$fromClause) {
+    if (!$entityId || !$entity) {
       return $lineItems;
     }
 
