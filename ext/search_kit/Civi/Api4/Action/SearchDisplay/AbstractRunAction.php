@@ -1571,9 +1571,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $field = $clause['fields'][$fieldAlias];
         if (!empty($field['input_attrs']['control_field']) && strpos($fieldAlias, ':')) {
           $prefix = substr($fieldAlias, 0, strrpos($fieldAlias, $field['name']));
-          // Don't need to add the field if a suffixed version already exists
-          if (!$this->getSelectExpression($prefix . $field['input_attrs']['control_field'] . ':label')) {
-            $this->addSelectExpression($prefix . $field['input_attrs']['control_field']);
+          $controlField = $prefix . $field['input_attrs']['control_field'];
+          if (
+            // Don't need to add the field if a suffixed version already exists
+            !array_intersect(array_keys($this->getSelectClause()), ["$controlField:label", "$controlField:name"]) &&
+            // Don't add if it would cause aggregation problems
+            !$this->canAggregate($controlField)
+          ) {
+            $this->addSelectExpression($controlField);
           }
         }
       }

@@ -3455,4 +3455,71 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals([$cids[0], $cids[1]], $result->column('key'));
   }
 
+  public function testGroupByCaseStatus(): void {
+    $cases = $this->saveTestRecords('Case', [
+      'records' => [
+        ['status_id:name' => 'Open'],
+        ['status_id:name' => 'Open'],
+        ['status_id:name' => 'Closed'],
+      ],
+    ]);
+    $caseIds = $cases->column('id');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Case',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'COUNT(id) AS COUNT_id',
+            'status_id:label',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['id', 'IN', $caseIds],
+          ],
+          'groupBy' => [
+            'status_id',
+          ],
+          'join' => [],
+          'having' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'status_id:label',
+              'label' => 'Status',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'COUNT_id',
+              'label' => 'Count',
+              'sortable' => TRUE,
+            ],
+          ],
+          'sort' => [
+            ['status_id:label', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    $data = array_column($result->column('data'), 'COUNT_id', 'status_id:label');
+    $this->assertEquals(1, $data['Resolved']);
+    $this->assertEquals(2, $data['Ongoing']);
+  }
+
 }
