@@ -541,7 +541,7 @@
             } else if (ctrl.isMultiSelect() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default.split(',');
             }
-            $timeout(function() {
+            $timeout(() => {
               ctrl.hasDefaultValue = true;
             });
           }

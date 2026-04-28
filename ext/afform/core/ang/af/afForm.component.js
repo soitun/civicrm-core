@@ -29,7 +29,7 @@
         // This component has no template. It makes its controller available within it by adding it to the parent scope.
         $scope.$parent[this.ctrl] = this;
 
-        $timeout(function() {
+        $timeout(() => {
           ctrl.loadData()
             .then(setupDraftWatcher);
 
@@ -428,7 +428,7 @@
           name: ctrl.getFormMeta().name,
           args: args,
           values: data,
-        }).then(function(response) {
+        }).then((response) => {
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
@@ -445,7 +445,7 @@
             postProcess();
           }
         })
-        .catch(function(error) {
+        .catch((error) => {
           $element.unblock();
 
           handleError(error);
@@ -473,7 +473,7 @@
           name: ctrl.getFormMeta().name,
           args: args,
           values: data,
-        }).then(function(response) {
+        }).then((response) => {
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             uploadingDraftFiles = true;
             ctrl.fileUploader.getNotUploadedItems().forEach((file) => {
@@ -488,7 +488,7 @@
             setDraftStatus('saved');
           }
         })
-        .catch(function(error) {
+        .catch((error) => {
           setDraftStatus('unsaved');
           handleError(error);
         });
