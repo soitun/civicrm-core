@@ -139,7 +139,7 @@ class CheckoutSession {
       self::STATUS_CANCEL => E::ts('Payment cancelled.'),
       self::STATUS_FAIL => E::ts('Payment failed'),
       self::STATUS_SUCCESS => E::ts('Payment complete'),
-      self::STATUS_PENDING => E::ts('Confirming payment status'),
+      self::STATUS_PENDING => E::ts('Confirming payment'),
     ];
   }
 
