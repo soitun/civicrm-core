@@ -888,9 +888,6 @@ WHERE li.contribution_id = %1";
       return;
     }
 
-    $changedFinancialTypeID = NULL;
-    $updatedContribution = new CRM_Contribute_BAO_Contribution();
-    $updatedContribution->id = (int) $contributionID;
     // insert financial items
     foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
       $lineParams = array_merge($lineParams, [
@@ -901,11 +898,6 @@ WHERE li.contribution_id = %1";
       if (!array_key_exists('skip', $lineParams)) {
         self::create($lineParams);
       }
-    }
-
-    if ($changedFinancialTypeID) {
-      $updatedContribution->financial_type_id = $changedFinancialTypeID;
-      $updatedContribution->save();
     }
   }
 
