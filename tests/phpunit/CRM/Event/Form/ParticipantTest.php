@@ -177,8 +177,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertEquals(100, $participant['participant_fee_amount']);
 
-    $priceSetID = $this->ids['PriceSet']['PaidEvent'];
-    $eventFeeBlock = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID)[$priceSetID]['fields'];
     $priceSetParams[$this->getPriceFieldKey()] = $this->ids['PriceFieldValue']['PaidEvent_family_package'];
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id']);
     // Check that no payment records have been created.
