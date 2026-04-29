@@ -35,6 +35,10 @@ namespace CiviMix\Schema;
  * @method bool tableExists(string $tableName)
  * @method bool dropTable(string $tableName)
  *
+ * [[ CiviCRM 6.15+ / civimix-schema@5.98+ ]]
+ *
+ * @method array getExistingTables(array $tableNames)
+ *
  * To see the latest implementation:
  *
  * @see ./SchemaHelper.php
