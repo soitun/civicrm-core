@@ -554,7 +554,7 @@ WHERE li.contribution_id = %1";
   }
 
   /**
-   * Function to update related contribution of a entity and
+   * Function to update related contribution of an entity and
    *  add/update/cancel financial records
    *
    * @param array $params
@@ -579,7 +579,7 @@ WHERE li.contribution_id = %1";
       $order->setForm($form);
     }
     unset($params);
-    $feeAmount = $updatedAmount = $order->getTotalAmount();
+    $feeAmount = $order->getTotalAmount();
     $taxAmount = $order->getTotalTaxAmount();
     $submittedLineItems = $order->getLineItems();
     $entityTable = 'civicrm_' . $entity;
@@ -602,13 +602,13 @@ WHERE li.contribution_id = %1";
     }
 
     // update line item with changed line total and other information
-    $totalParticipant = $participantCount = 0;
+    $totalParticipant = 0;
     $amountLevel = [];
     if (!empty($requiredChanges['line_items_to_update'])) {
-      foreach ($requiredChanges['line_items_to_update'] as $priceFieldValueID => $value) {
-        $amountLevel[] = $value['label'] . ' - ' . (float) $value['qty'];
-        if ($entity == 'participant' && isset($value['participant_count'])) {
-          $totalParticipant += $value['participant_count'];
+      foreach ($requiredChanges['line_items_to_update'] as $priceFieldValueID => $priceFieldValue) {
+        $amountLevel[] = $priceFieldValue['label'] . ' - ' . (float) $priceFieldValue['qty'];
+        if ($entity == 'participant' && isset($priceFieldValue['participant_count'])) {
+          $totalParticipant += $priceFieldValue['participant_count'];
         }
       }
     }
