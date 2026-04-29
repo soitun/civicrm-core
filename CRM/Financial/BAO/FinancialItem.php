@@ -42,20 +42,20 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @return CRM_Financial_DAO_FinancialItem
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
-    $financialItemStatus = CRM_Financial_DAO_FinancialItem::buildOptions('status_id');
+    $financialItemStatus = array_column(\Civi::entity('FinancialItem')->getOptions('status_id'), 'id', 'name');
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $itemStatus = NULL;
     if ($contributionStatus === 'Completed' || $contributionStatus === 'Pending refund') {
-      $itemStatus = array_search('Paid', $financialItemStatus);
+      $itemStatus = $financialItemStatus['Paid'];
     }
     elseif ($contributionStatus === 'Pending'
       // In progress is no longer present on new installs unless extensions add it.
       || $contributionStatus === 'In Progress'
     ) {
-      $itemStatus = array_search('Unpaid', $financialItemStatus);
+      $itemStatus = $financialItemStatus['Unpaid'];
     }
     elseif ($contributionStatus === 'Partially paid') {
-      $itemStatus = array_search('Partially paid', $financialItemStatus);
+      $itemStatus = $financialItemStatus['Partially paid'];
     }
     $params = [
       'transaction_date' => $contribution->receive_date,
