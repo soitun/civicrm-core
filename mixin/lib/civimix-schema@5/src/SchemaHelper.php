@@ -56,6 +56,8 @@ return new class() implements SchemaHelperInterface {
 
   /**
    * Check if a single table exists.
+   *
+   * Note, this function is case-insensitive.
    */
   public function tableExists(string $tableName): bool {
     $existing = $this->getExistingTables([$tableName]);
@@ -64,14 +66,18 @@ return new class() implements SchemaHelperInterface {
 
   /**
    * Given a list of table names, return the ones that exist.
+   *
+   * Note: matching is case-insensitive, but the canonical case will be returned.
+   * So `getExistingTables(['CiviCRM_ACTIVITY'])` will return `['civicrm_activity']`.
+   *
    * @since 6.15
    */
   public function getExistingTables(array $tableNames): array {
     if (empty($tableNames)) {
       return [];
     }
-    $escaped = implode("', '", array_map(['\CRM_Core_DAO', 'escapeString'], $tableNames));
-    $dao = \CRM_Core_DAO::executeQuery("SELECT TABLE_NAME AS table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ('$escaped')");
+    $conditions = implode("' OR TABLE_NAME LIKE '", array_map(['\CRM_Core_DAO', 'escapeString'], $tableNames));
+    $dao = \CRM_Core_DAO::executeQuery("SELECT TABLE_NAME AS table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND (TABLE_NAME LIKE '$conditions')");
     return $dao->fetchMap('table_name', 'table_name');
   }
 
