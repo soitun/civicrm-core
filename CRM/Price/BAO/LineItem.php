@@ -559,7 +559,7 @@ WHERE li.contribution_id = %1";
    *
    * @param array $params
    * @param int $entityID
-   * @param int $entity
+   * @param string $entity
    * @param int $contributionId
    * @param \CRM_Core_Form|null $form
    *
