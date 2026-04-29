@@ -18,17 +18,19 @@ use CRM_Standaloneusers_BAO_Role;
  * alternative user extensions to Standaloneusers are developed as
  * these would then need to share an interface with the System
  * class
+ *
+ * @service standaloneusers.security
  */
-class Security {
+class Security extends Civi\Core\Service\AutoService {
 
   /**
    * @return Security
+   * @deprecated
+   *   See Civi::service('standaloneusers.security') in 6.15+.
+   *   Drop in 6.21+ or later.
    */
   public static function singleton() {
-    if (!isset(\Civi::$statics[__METHOD__])) {
-      \Civi::$statics[__METHOD__] = new Security();
-    }
-    return \Civi::$statics[__METHOD__];
+    return Civi::service('standaloneusers.security');
   }
 
   /**
