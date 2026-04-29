@@ -54,8 +54,25 @@ return new class() implements SchemaHelperInterface {
     return \Civi::entity($entityName)->getMeta('table');
   }
 
+  /**
+   * Check if a single table exists.
+   */
   public function tableExists(string $tableName): bool {
-    return \CRM_Core_DAO::checkTableExists($tableName);
+    $existing = $this->getExistingTables([$tableName]);
+    return count($existing) === 1;
+  }
+
+  /**
+   * Given a list of table names, return the ones that exist.
+   * @since 6.15
+   */
+  public function getExistingTables(array $tableNames): array {
+    if (empty($tableNames)) {
+      return [];
+    }
+    $escaped = implode("', '", array_map(['\CRM_Core_DAO', 'escapeString'], $tableNames));
+    $dao = \CRM_Core_DAO::executeQuery("SELECT TABLE_NAME AS table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ('$escaped')");
+    return $dao->fetchMap('table_name', 'table_name');
   }
 
   /**
