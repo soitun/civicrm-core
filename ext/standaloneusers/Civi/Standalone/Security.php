@@ -27,6 +27,7 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
   public static function getSubscribedEvents() {
     return [
       '&civi.standalone.loadUser' => ['onLoadUser', 1000],
+      '&civi.standalone.checkPassword' => ['onCheckPassword', -500],
     ];
   }
 
@@ -126,10 +127,19 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
     if (!is_array($user)) {
       throw new \LogicException("Security::checkPassword() expects user as array. Received type: " . gettype($user));
     }
-    if ($this->checkHashedPassword($plaintextPassword, $user['hashed_password'])) {
-      return $user['id'];
+    $success = NULL;
+    Civi::dispatcher()->dispatch('civi.standalone.checkPassword', Civi\Core\Event\GenericHookEvent::create([
+      'user' => $user,
+      'password' => $plaintextPassword,
+      'success' => &$success,
+    ]));
+    return $success ? $user['id'] : NULL;
+  }
+
+  public function onCheckPassword(array $user, string $password, ?bool &$success): void {
+    if ($success === NULL && !empty($user['hashed_password']) && $this->checkHashedPassword($password, $user['hashed_password'])) {
+      $success = TRUE;
     }
-    return NULL;
   }
 
   /**
