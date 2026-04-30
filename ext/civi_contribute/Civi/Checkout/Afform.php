@@ -25,7 +25,7 @@ class Afform extends AutoService implements EventSubscriberInterface {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       // add CheckoutOption modules as dependencies of afCheckout
       'hook_civicrm_angularModules' => ['onAlterAngularModules', -1010],

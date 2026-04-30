@@ -53,7 +53,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.afform.validate' => [
         // TODO: this belongs in a hook to validate a form
