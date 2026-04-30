@@ -3,6 +3,7 @@ namespace Civi\Standalone;
 
 use Civi;
 use CRM_Standaloneusers_BAO_Role;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Security related functions for Standaloneusers.
@@ -21,7 +22,13 @@ use CRM_Standaloneusers_BAO_Role;
  *
  * @service standaloneusers.security
  */
-class Security extends Civi\Core\Service\AutoService {
+class Security extends Civi\Core\Service\AutoService implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents() {
+    return [
+      '&civi.standalone.loadUser' => ['onLoadUser', 1000],
+    ];
+  }
 
   /**
    * @return Security
@@ -124,6 +131,16 @@ class Security extends Civi\Core\Service\AutoService {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function loadUser(string $identifier): ?array {
+    $user = NULL;
+    Civi::dispatcher()->dispatch('civi.standalone.loadUser', Civi\Core\Event\GenericHookEvent::create([
+      'identifier' => $identifier,
+      'user' => &$user,
+    ]));
+    return $user;
+  }
+
+  public function onLoadUser(string $identifier, ?array &$user): void {
+
     // This is the set of columns that have been used for prior lookups.
     // Going forward, we want to allow merging data from external user-db.
     // Maybe shift expectation to encourage more expansive output?
@@ -145,8 +162,6 @@ class Security extends Civi\Core\Service\AutoService {
         ->addSelect(...$select)
         ->execute()->first();
     }
-
-    return $user;
   }
 
   /**
