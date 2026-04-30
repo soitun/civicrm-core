@@ -76,8 +76,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->execute()->single();
 
     // Test that the password can be checked ok.
-    $this->assertTrue((bool) $security->checkPassword($user['username'], 'secret1'));
-    $this->assertFalse((bool) $security->checkPassword($user['username'], 'some other password'));
+    $this->assertTrue((bool) $security->checkPassword($user, 'secret1'));
+    $this->assertFalse((bool) $security->checkPassword($user, 'some other password'));
   }
 
   public function testPerms() {
@@ -210,7 +210,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     $this->assertEquals(1, $result['success']);
     $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single();
-    $this->assertTrue((bool) $security->checkPassword($user['username'], 'fingersCrossed'));
+    $this->assertTrue((bool) $security->checkPassword($user, 'fingersCrossed'));
 
     // Should not work a 2nd time with same token.
     try {

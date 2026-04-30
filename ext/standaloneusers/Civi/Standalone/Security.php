@@ -112,13 +112,21 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
   /**
    * Standaloneusers implementation of AuthxInterface::checkPassword
    *
+   * @param array|NULL|FALSE $user
+   *   APIv4-style user-record
+   * @param string $plaintextPassword
    * @return int|NULL
    *   The User id, if check was successful, otherwise NULL
    * @see \Civi\Authx\Standalone
    */
-  public function checkPassword(string $username, string $plaintextPassword): ?int {
-    $user = $this->loadUser($username);
-    if ($user && $this->checkHashedPassword($plaintextPassword, $user['hashed_password'])) {
+  public function checkPassword($user, string $plaintextPassword): ?int {
+    if (!$user) {
+      return NULL;
+    }
+    if (!is_array($user)) {
+      throw new \LogicException("Security::checkPassword() expects user as array. Received type: " . gettype($user));
+    }
+    if ($this->checkHashedPassword($plaintextPassword, $user['hashed_password'])) {
       return $user['id'];
     }
     return NULL;

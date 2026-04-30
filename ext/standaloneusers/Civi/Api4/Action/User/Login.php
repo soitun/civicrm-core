@@ -200,7 +200,7 @@ class Login extends AbstractAction {
       return;
     }
 
-    $userID = Security::singleton()->checkPassword($user['username'], $this->password);
+    $userID = Security::singleton()->checkPassword($user, $this->password);
     if (!$userID) {
       // Allow monitoring of failed attempts.
       $event = new LoginEvent('post_credentials_check', $user['id'], 'wrongUserPassword');
