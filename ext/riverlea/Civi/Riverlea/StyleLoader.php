@@ -39,7 +39,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     '_fixes.css',
   ];
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'hook_civicrm_themes' => ['onGetThemes', 0],
       'hook_civicrm_alterBundle' => ['alterBundles', 0],
