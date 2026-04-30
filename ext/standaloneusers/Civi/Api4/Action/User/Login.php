@@ -178,22 +178,7 @@ class Login extends AbstractAction {
     }
 
     // Check for matching user
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('username', '=', $this->identifier)
-      ->addWhere('is_active', '=', TRUE)
-      ->addSelect('username', 'id')
-      ->execute()->first();
-
-    // TODO: should login by email be behind a setting?
-    // if (!$user && \Civi::settings()->get('standaloneusers_allow_login_by_email')) {
-    if (!$user) {
-      // Since the identifier did not match a username, try an email.
-      $user = \Civi\Api4\User::get(FALSE)
-        ->addWhere('uf_name', '=', $this->identifier)
-        ->addWhere('is_active', '=', TRUE)
-        ->addSelect('username', 'id')
-        ->execute()->first();
-    }
+    $user = Civi::service('standaloneusers.security')->loadUser($this->identifier);
 
     // Allow flood control (etc.) by extensions.
     $event = new LoginEvent('pre_credentials_check', $user['id'] ?? NULL);

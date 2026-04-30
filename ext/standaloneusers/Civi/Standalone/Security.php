@@ -110,17 +110,43 @@ class Security extends Civi\Core\Service\AutoService {
    * @see \Civi\Authx\Standalone
    */
   public function checkPassword(string $username, string $plaintextPassword): ?int {
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('username', '=', $username)
-      ->addWhere('is_active', '=', TRUE)
-      ->addSelect('hashed_password', 'id')
-      ->execute()
-      ->first();
-
+    $user = $this->loadUser($username);
     if ($user && $this->checkHashedPassword($plaintextPassword, $user['hashed_password'])) {
       return $user['id'];
     }
     return NULL;
+  }
+
+  /**
+   * @param string $identifier
+   * @return array|null
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function loadUser(string $identifier): ?array {
+    // This is the set of columns that have been used for prior lookups.
+    // Going forward, we want to allow merging data from external user-db.
+    // Maybe shift expectation to encourage more expansive output?
+    $select = ['username', 'id', 'hashed_password'];
+
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addWhere('username', '=', $identifier)
+      ->addWhere('is_active', '=', TRUE)
+      ->addSelect(...$select)
+      ->execute()->first();
+
+    // TODO: should login by email be behind a setting?
+    // if (!$user && \Civi::settings()->get('standaloneusers_allow_login_by_email')) {
+    if (!$user) {
+      // Since the identifier did not match a username, try an email.
+      $user = \Civi\Api4\User::get(FALSE)
+        ->addWhere('uf_name', '=', $identifier)
+        ->addWhere('is_active', '=', TRUE)
+        ->addSelect(...$select)
+        ->execute()->first();
+    }
+
+    return $user;
   }
 
   /**
