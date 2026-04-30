@@ -144,7 +144,7 @@
                 values: $scope.dataProvider.getFieldData()
               };
               crmApi4('Afform', 'getOptions', params)
-                .then(function(data) {
+                .then((data) => {
                   $('input[crm-ui-select]', $element).removeClass('loading').prop('disabled', !data.length);
                   fieldOptions = data;
                   validateValue();
@@ -173,7 +173,7 @@
         }
 
         // Wait for parent controllers to initialize
-        $timeout(function() {
+        $timeout(() => {
           initializeValue(true);
           $scope.$watch('$parent.routeParams', setValueFromRouteParams);
         });
