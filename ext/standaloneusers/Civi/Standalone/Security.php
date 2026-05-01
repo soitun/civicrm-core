@@ -158,16 +158,9 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
   }
 
   public function onLoadUser(string $identifier, ?array &$user): void {
-
-    // This is the set of columns that have been used for prior lookups.
-    // Going forward, we want to allow merging data from external user-db.
-    // Maybe shift expectation to encourage more expansive output?
-    $select = ['username', 'id', 'hashed_password'];
-
     $user = \Civi\Api4\User::get(FALSE)
       ->addWhere('username', '=', $identifier)
       ->addWhere('is_active', '=', TRUE)
-      ->addSelect(...$select)
       ->execute()->first();
 
     // TODO: should login by email be behind a setting?
@@ -177,7 +170,6 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
       $user = \Civi\Api4\User::get(FALSE)
         ->addWhere('uf_name', '=', $identifier)
         ->addWhere('is_active', '=', TRUE)
-        ->addSelect(...$select)
         ->execute()->first();
     }
   }
