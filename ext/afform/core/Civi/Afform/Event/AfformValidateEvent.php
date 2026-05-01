@@ -65,12 +65,17 @@ class AfformValidateEvent extends AfformBaseEvent {
     if (!$entity || (isset($joinEntity) && !isset($entity['joins'][$joinEntity]))) {
       return [];
     }
-    $apiEntity = $joinEntity ?? $entity['type'];
-    $baseDefn = $this->getFormDataModel()->getField($apiEntity, $fieldName, 'create') ?: [];
 
-    $fieldDefn = isset($joinEntity) ?
+    $fieldDefn = isset($joinEntity, $entity['type']) ?
       ($entity['joins'][$joinEntity]['fields'][$fieldName]['defn'] ?? []) :
       ($entity['fields'][$fieldName]['defn'] ?? []);
+
+    if (!$entity['type']) {
+      return $fieldDefn;
+    }
+
+    $apiEntity = $joinEntity ?? $entity['type'];
+    $baseDefn = $this->getFormDataModel()->getField($apiEntity, $fieldName, 'create') ?: [];
 
     // Merge base field defn with what's already in the form markup.
     $fieldDefn += $baseDefn;

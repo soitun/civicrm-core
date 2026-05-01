@@ -51,6 +51,10 @@ class FormDataModel {
       $this->entities[$entity] = array_merge($this->defaults, $this->entities[$entity]);
       $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
     }
+    $this->entities['extra'] = [
+      'type' => NULL,
+      'fields' => [],
+    ];
     // Pre-load full list of afforms in case this layout embeds other afform directives
     $this->blocks = (array) Afform::get(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
     $this->parseFields($layout);
@@ -171,7 +175,10 @@ class FormDataModel {
         $this->searchDisplays[$searchDisplay]['fields'][$node['name']] = AHQ::getProps($node);
       }
       elseif ($entity && $node['#tag'] === 'af-field') {
-        if ($join) {
+        if (!isset($node['name'])) {
+          $this->entities['extra']['fields'][$node['defn']['name']] = AHQ::getProps($node);
+        }
+        elseif ($join) {
           $this->entities[$entity]['joins'][$join]['fields'][$node['name']] = AHQ::getProps($node);
         }
         else {
@@ -210,13 +217,16 @@ class FormDataModel {
   /**
    * Loads a field definition from the schema
    *
-   * @param string $entityName
+   * @param string|null $entityName
    * @param string $fieldName
    * @param string $action
    * @param array $values
    * @return array|NULL
    */
-  public static function getField(string $entityName, string $fieldName, string $action, array $values = []): ?array {
+  public static function getField(?string $entityName, string $fieldName, string $action, array $values = []): ?array {
+    if (!$entityName) {
+      return NULL;
+    }
     // For explicit joins, strip the alias off the field name
     if (strpos($entityName, ' AS ')) {
       [$entityName, $alias] = explode(' AS ', $entityName);

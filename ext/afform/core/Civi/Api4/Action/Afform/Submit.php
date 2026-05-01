@@ -146,7 +146,7 @@ class Submit extends AbstractProcessor {
             $event->setError($error);
           }
         }
-        foreach ($afEntity['joins'] as $joinEntity => $join) {
+        foreach ($afEntity['joins'] ?? [] as $joinEntity => $join) {
           foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
               $fieldDefn = $event->getEntityFieldDefn($afEntityName, $fieldName, $joinEntity);
@@ -232,7 +232,7 @@ class Submit extends AbstractProcessor {
             $event->setError($error);
           }
         }
-        foreach ($entity['joins'] as $joinEntity => $join) {
+        foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
           foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
               $error = self::getEntityRefError($formName, $entityName . '+' . $joinEntity, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL);
@@ -259,12 +259,8 @@ class Submit extends AbstractProcessor {
    * If a required field is missing a value, return an error message
    */
   private static function getRequiredFieldError(AfformValidateEvent $event, string $fieldName, array $fieldDefn, array $attributes, $value) {
-    // If we have a value, no need to check if required
-    if ($value || is_numeric($value) || is_bool($value)) {
-      return NULL;
-    }
-    // Required set to false, no need to validate
-    if (isset($fieldDefn['required']) && !$fieldDefn['required']) {
+    // If we have a value or field is not required, skip
+    if ($value || is_numeric($value) || is_bool($value) || empty($fieldDefn['required'])) {
       return NULL;
     }
     // InputType set to 'DisplayOnly' which skips validation
@@ -363,13 +359,13 @@ class Submit extends AbstractProcessor {
    *
    * @param string $formName
    * @param string $entityName
-   * @param string $apiEntity
+   * @param string|null $apiEntity
    * @param string $fieldName
    * @param array $attributes
    * @param mixed $value
    * @return string|null
    */
-  private static function getEntityRefError(string $formName, string $entityName, string $apiEntity, string $fieldName, $attributes, $value) {
+  private static function getEntityRefError(string $formName, string $entityName, ?string $apiEntity, string $fieldName, $attributes, $value) {
     $values = array_filter((array) $value);
     // If we have no values, continue
     if (!$values) {
@@ -439,7 +435,7 @@ class Submit extends AbstractProcessor {
    */
   public static function preprocessContact(AfformSubmitEvent $event): void {
     $entityType = $event->getEntityType();
-    if (!CoreUtil::isContact($entityType)) {
+    if (!$entityType || !CoreUtil::isContact($entityType)) {
       return;
     }
     // When creating a contact, verify they have a name or email address

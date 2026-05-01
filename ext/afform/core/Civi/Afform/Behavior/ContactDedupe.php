@@ -56,7 +56,7 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
   public static function onAfformSubmit(AfformSubmitEvent $event) {
     $entity = $event->getEntity();
     $dedupeMode = $entity['contact-dedupe'] ?? NULL;
-    if (!CoreUtil::isContact($entity['type']) || !$dedupeMode) {
+    if (!$entity['type'] || !CoreUtil::isContact($entity['type']) || !$dedupeMode) {
       return;
     }
     // Apply dedupe rule if contact isn't already identified

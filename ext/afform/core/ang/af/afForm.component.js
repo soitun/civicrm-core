@@ -11,10 +11,13 @@
     controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
       const
         ctrl = this,
-        ts = CRM.ts('org.civicrm.afform'),
-        saveDraftButtons = [],
-        schema = {},
-        data = {extra: {}};
+        ts = CRM.ts('org.civicrm.afform');
+
+      const saveDraftButtons = [];
+      const schema = {};
+      const data = {
+        extra: {fields: {}},
+      };
 
       let
         args,
@@ -546,7 +549,7 @@
 
       // Used by "extra" afFields that have no entity.
       this.getFieldData = () => {
-        return data.extra;
+        return data.extra.fields;
       };
 
       // these tokens matching/replacing functions should match
