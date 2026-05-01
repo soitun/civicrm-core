@@ -386,6 +386,11 @@
       this.submit = function () {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
+          // check whether its missing required or just invalid
+          const firstInvalidInput = $element[0].closest('af-form').querySelector('.ng-invalid');
+          const isRequired = firstInvalidInput.classList.contains('ng-invalid-required');
+          const message = isRequired ? ts('Please fill all required fields.') : ts('Please check all answers are valid.');
+
           // at this point we want the user to know to check the invalid fields
           //
           // the complication is the browser will natively trigger notifications
@@ -404,8 +409,18 @@
           //
           // TODO: in the long run we should provide a way for callers of
           // CRM.alert to specify between interrupting vs non-interrupting alerts
+
           if (document.getElementById('crm-notification-container')) {
-            CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
+            CRM.alert(message, ts('Form Error'));
+          }
+          else {
+            // catch case on the frontend where the invalid element is hidden
+            // (and its native validation along with it)
+            if (firstInvalidInput.classList.contains('select2-container')) {
+              firstInvalidInput.scrollIntoView();
+              firstInvalidInput.focus();
+              CRM.alert(message, ts('Form Error'));
+            }
           }
           return;
         }
