@@ -8,7 +8,6 @@ use Civi\Api4\User;
 use Civi\Crypto\Exception\CryptoException;
 use Civi\Standalone\Event\LoginEvent;
 use Civi\Standalone\MFA\Base as MFABase;
-use Civi\Standalone\Security;
 
 class Login extends AbstractAction {
 
@@ -200,7 +199,7 @@ class Login extends AbstractAction {
       return;
     }
 
-    $userID = Security::singleton()->checkPassword($user, $this->password);
+    $userID = \Civi::service('standaloneusers.security')->checkPassword($user, $this->password);
     if (!$userID) {
       // Allow monitoring of failed attempts.
       $event = new LoginEvent('post_credentials_check', $user['id'], 'wrongUserPassword');
