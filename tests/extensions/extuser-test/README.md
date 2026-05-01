@@ -1,12 +1,16 @@
 # extuser-test
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
 
-This is an [extension for CiviCRM](https://docs.civicrm.org/sysadmin/en/latest/customize/extensions/), licensed under [AGPL-3.0](LICENSE.txt).
+Example extension that integrates support for an external user-credential (such as LDAP or flat file).
 
-## Getting Started
+General goals of the test are:
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+* Listen to events like `civi.standalone.loadUser` and `civi.standalone.checkPassword`.
+* Create some sample user (username/password) with the hook.
+* Use PHPUnit to login (with the username/password).
+* Be relatively simple.
+* If a developer/evaluator accidentally enables this on staging, don't create an obvious vulnerability (like a static password).
 
-## Known Issues
+The sample user will have this convention:
 
-(* FIXME *)
+* The file `extuser_test.json` contains the list of sample users.
+* The passwords are computed as `JWT(scope=>extuser-test, sub=>username)`.
