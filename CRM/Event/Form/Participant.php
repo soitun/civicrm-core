@@ -756,16 +756,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     // do the amount validations.
-    //skip for update mode since amount is freeze, CRM-6052
-    if ((!$self->_id && empty($values['total_amount']) &&
-        empty($self->_values['line_items'])
-      ) ||
-      ($self->_id && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
+    //skip for update mode since amount is frozen, CRM-6052
+    if ($self->getEventValue('is_monetary') && $self->getPriceSetID() &&
+      (
+        (!$self->getParticipantID() && empty($values['total_amount']))
+        ||
+        ($self->getParticipantID() && !$self->getExistingContributionID())
+      )
     ) {
-      // @todo - this seems unreachable.
-      if ($self->getPriceSetID()) {
-        CRM_Price_BAO_PriceField::priceSetValidation($self->getPriceSetID(), $values, $errorMsg, TRUE);
-      }
+      CRM_Price_BAO_PriceField::priceSetValidation($self->getPriceSetID(), $values, $errorMsg, TRUE);
     }
     // For single additions - show validation error if the contact has already been registered
     // for this event.
@@ -1210,7 +1209,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->getEventValue('is_monetary')) {
       //retrieve custom information
       $this->_values = [];
-      $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'participant');
       $this->initEventFee($this->getPriceSetID());
       if ($form->_context === 'standalone' || $form->_context === 'participant') {
         $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($this->getEventID(), 'civicrm_event');
