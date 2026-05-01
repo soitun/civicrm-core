@@ -1197,7 +1197,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
 
     if ($form->_eventId) {
-      $form->_isPaidEvent = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'is_monetary');
+      $form->_isPaidEvent = $this->getEventValue('is_monetary');
       if ($form->_isPaidEvent) {
         $form->addElement('hidden', 'hidden_feeblock', 1);
       }
@@ -1207,16 +1207,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg ?? NULL, ['id' => 'hidden_eventFullMsg']);
     }
 
-    if ($form->_isPaidEvent) {
-      $params = ['id' => $form->_eventId];
-      CRM_Event_BAO_Event::retrieve($params, $event);
-
+    if ($this->getEventValue('is_monetary')) {
       //retrieve custom information
       $this->_values = [];
       $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'participant');
       $this->initEventFee($this->getPriceSetID());
       if ($form->_context === 'standalone' || $form->_context === 'participant') {
-        $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($event['id'], 'civicrm_event');
+        $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($this->getEventID(), 'civicrm_event');
         if (is_array($discountedEvent)) {
           foreach ($discountedEvent as $key => $discountedPriceSetID) {
             $discountedPriceSet = CRM_Price_BAO_PriceSet::getSetDetail($discountedPriceSetID);
