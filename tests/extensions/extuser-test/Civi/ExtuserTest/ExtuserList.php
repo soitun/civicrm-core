@@ -13,11 +13,15 @@ class ExtuserList extends AutoService {
 
   public function getFile(): string {
     // TODO: move to data folder
-    return E::path('extuser_test.json');
+    return \Civi::paths()->getPath('[civicrm.private]/ext_users-' . hash_hmac('sha256', 'ext_users', CIVICRM_SIGN_KEYS) . '.json');
   }
 
   public function getAll(): array {
-    return json_decode(file_get_contents($this->getFile()), TRUE);
+    $file = $this->getFile();
+    if (!file_exists($file)) {
+      return [];
+    }
+    return json_decode(file_get_contents($file), TRUE);
   }
 
   public function get(string $identifier): ?array {
@@ -27,6 +31,12 @@ class ExtuserList extends AutoService {
       }
     }
     return NULL;
+  }
+
+  public function update(string $identifier, array $updates): void {
+    $row = $this->get($identifier);
+    $row = array_merge($row, $updates);
+    $this->save($row);
   }
 
   public function save(array $row): void {

@@ -10,7 +10,4 @@ General goals of the test are:
 * Be relatively simple.
 * If a developer/evaluator accidentally enables this on staging, don't create an obvious vulnerability (like a static password).
 
-The sample user will have this convention:
-
-* The file `extuser_test.json` contains the list of sample users.
-* The passwords are computed as `JWT(scope=>extuser-test, sub=>username)`.
+The current design stores the external user-credentials in `[civicrm.private]/extuser_test.[code].json`.

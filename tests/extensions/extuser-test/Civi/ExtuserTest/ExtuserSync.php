@@ -92,6 +92,7 @@ class ExtuserSync extends AutoService implements EventSubscriberInterface {
         // 'username' => $identifier,
         'uf_name' => $row['mail'],
       ])
+      ->setReload(TRUE)
       ->execute()
       ->single();
 
