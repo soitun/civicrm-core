@@ -157,6 +157,10 @@ WHERE li.contribution_id = %1";
    *   Array of line items
    */
   public static function getLineItems($entityId, $entity = 'participant', $isQuick = FALSE, $isQtyZero = TRUE, $relatedEntity = FALSE) {
+    if (!$entityId || !$entity) {
+      CRM_Core_Error::deprecatedWarning('calling without entityId or entity is deprecated');
+      return [];
+    }
     $selectClause = '
       SELECT li.id,
       li.label,
@@ -201,10 +205,6 @@ WHERE li.contribution_id = %1";
     }
 
     $lineItems = [];
-
-    if (!$entityId || !$entity) {
-      return $lineItems;
-    }
 
     $params = [
       1 => [$entityId, 'Integer'],
