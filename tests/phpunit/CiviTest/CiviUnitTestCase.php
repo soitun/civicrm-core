@@ -1104,14 +1104,22 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'source' => 'SSF',
-      'contribution_status_id' => 'Completed',
-      'contribution_status_id:name' => 'Completed',
       'version' => 3,
     ], $params);
+
+    // Note: Ideally default for contribution_status_id would be "Pending" but tests are expecting default=Completed.
     if ($params['version'] === 4) {
+      if (!isset($params['contribution_status_id:name']) && !isset($params['contribution_status_id'])) {
+        $params['contribution_status_id:name'] = 'Completed';
+      }
       return $this->createTestEntity('Contribution', $params, $identifier)['id'];
     }
-    return $this->callAPISuccess('Contribution', 'create', $params)['id'];
+    else {
+      if (!isset($params['contribution_status_id'])) {
+        $params['contribution_status_id'] = 'Completed';
+      }
+      return $this->callAPISuccess('Contribution', 'create', $params)['id'];
+    }
   }
 
   /**
