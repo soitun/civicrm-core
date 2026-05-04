@@ -3,6 +3,7 @@ namespace Civi\Standalone;
 
 use Civi;
 use CRM_Standaloneusers_BAO_Role;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Security related functions for Standaloneusers.
@@ -18,17 +19,26 @@ use CRM_Standaloneusers_BAO_Role;
  * alternative user extensions to Standaloneusers are developed as
  * these would then need to share an interface with the System
  * class
+ *
+ * @service standaloneusers.security
  */
-class Security {
+class Security extends Civi\Core\Service\AutoService implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents() {
+    return [
+      '&civi.standalone.loadUser' => ['onLoadUser', 1000],
+      '&civi.standalone.checkPassword' => ['onCheckPassword', -500],
+    ];
+  }
 
   /**
    * @return Security
+   * @deprecated
+   *   See Civi::service('standaloneusers.security') in 6.15+.
+   *   Drop in 6.21+ or later.
    */
   public static function singleton() {
-    if (!isset(\Civi::$statics[__METHOD__])) {
-      \Civi::$statics[__METHOD__] = new Security();
-    }
-    return \Civi::$statics[__METHOD__];
+    return Civi::service('standaloneusers.security');
   }
 
   /**
@@ -103,22 +113,65 @@ class Security {
   /**
    * Standaloneusers implementation of AuthxInterface::checkPassword
    *
+   * @param array|NULL|FALSE $user
+   *   APIv4-style user-record
+   * @param string $plaintextPassword
    * @return int|NULL
    *   The User id, if check was successful, otherwise NULL
    * @see \Civi\Authx\Standalone
    */
-  public function checkPassword(string $username, string $plaintextPassword): ?int {
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('username', '=', $username)
-      ->addWhere('is_active', '=', TRUE)
-      ->addSelect('hashed_password', 'id')
-      ->execute()
-      ->first();
-
-    if ($user && $this->checkHashedPassword($plaintextPassword, $user['hashed_password'])) {
-      return $user['id'];
+  public function checkPassword($user, string $plaintextPassword): ?int {
+    if (!$user) {
+      return NULL;
     }
-    return NULL;
+    if (!is_array($user)) {
+      throw new \LogicException("Security::checkPassword() expects user as array. Received type: " . gettype($user));
+    }
+    $success = NULL;
+    Civi::dispatcher()->dispatch('civi.standalone.checkPassword', Civi\Core\Event\GenericHookEvent::create([
+      'user' => $user,
+      'password' => $plaintextPassword,
+      'success' => &$success,
+    ]));
+    return $success ? $user['id'] : NULL;
+  }
+
+  public function onCheckPassword(array $user, string $password, ?bool &$success): void {
+    if ($success === NULL && !empty($user['hashed_password']) && $this->checkHashedPassword($password, $user['hashed_password'])) {
+      $success = TRUE;
+    }
+  }
+
+  /**
+   * @param string $identifier
+   * @return array|null
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function loadUser(string $identifier): ?array {
+    $user = NULL;
+    Civi::dispatcher()->dispatch('civi.standalone.loadUser', Civi\Core\Event\GenericHookEvent::create([
+      'identifier' => $identifier,
+      'user' => &$user,
+    ]));
+    return $user;
+  }
+
+  public function onLoadUser(string $identifier, ?array &$user): void {
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addWhere('username', '=', $identifier)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first();
+
+    // TODO: should login by email be behind a setting?
+    // if (!$user && \Civi::settings()->get('standaloneusers_allow_login_by_email')) {
+    if (!$user) {
+      // Since the identifier did not match a username, try an email.
+      $user = \Civi\Api4\User::get(FALSE)
+        ->addWhere('uf_name', '=', $identifier)
+        ->addWhere('is_active', '=', TRUE)
+        ->execute()->first();
+    }
   }
 
   /**

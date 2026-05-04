@@ -11,15 +11,15 @@
 
 namespace Civi\Authx;
 
-use Civi\Standalone\Security;
-
 class Standalone implements AuthxInterface {
 
   /**
    * @inheritDoc
    */
   public function checkPassword(string $username, string $password) {
-    return Security::singleton()->checkPassword($username, $password);
+    $security = \Civi::service('standaloneusers.security');
+    $user = $security->loadUser($username);
+    return $security->checkPassword($user, $password);
   }
 
   /**
