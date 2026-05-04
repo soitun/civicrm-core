@@ -86,10 +86,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       );
     }
     if (empty($trxnId)) {
-      if (empty($trxnId['id'])) {
-        $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
-        $trxnId['id'] = $trxn['financialTrxnId'];
-      }
+      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
+      $trxnId['id'] = $trxn['financialTrxnId'];
     }
     return self::create($params, NULL, $trxnId);
   }
