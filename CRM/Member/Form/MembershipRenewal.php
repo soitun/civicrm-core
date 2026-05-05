@@ -570,7 +570,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // chk for renewal for multiple terms CRM-8750
     $numRenewTerms = 1;
     if (is_numeric($this->_params['num_terms'] ?? '')) {
-      $numRenewTerms = $this->_params['num_terms'];
+      $numRenewTerms = (int) $this->_params['num_terms'];
     }
 
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
@@ -614,8 +614,16 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       //create line items
       $this->_params = $this->setPriceSetParameters($this->_params);
-
       $this->_params = array_merge($this->_params, $this->getOrderParams());
+      // numTerms comes in from the form above. But lineitem value gets set to default from PriceField
+      // We need the lineitem to include the form value for membership renewal to work properly via lineitems.
+      foreach ($this->_params['lineItems'] as &$priceSetLineItem) {
+        foreach ($priceSetLineItem as &$lineItem) {
+          if ($this->_memType === $lineItem['membership_type_id']) {
+            $lineItem['membership_num_terms'] = $numRenewTerms;
+          }
+        }
+      }
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
