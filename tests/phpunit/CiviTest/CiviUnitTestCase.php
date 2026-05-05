@@ -3537,7 +3537,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function validatePayments($payments): void {
     foreach ($payments as $payment) {
-      $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($payment['contribution_id']);
+      $balance = \Civi\Api4\Contribution::get(FALSE)
+        ->addSelect('balance_amount')
+        ->addWhere('id', '=', $payment['contribution_id'])
+        ->execute()
+        ->first()['balance_amount'];
       if ($balance < 0 && $balance + $payment['total_amount'] === 0.0) {
         // This is an overpayment situation. there are no financial items to allocate the overpayment.
         // This is a pretty rough way at guessing which payment is the overpayment - but
