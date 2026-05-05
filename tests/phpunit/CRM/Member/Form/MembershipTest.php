@@ -1758,6 +1758,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'receive_date' => '2020-08-08',
     ];
     $contribution1 = CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
+    $contributionParams['contribution_id'] = $contribution1->id;
 
     // 2nd Payment
     $contributionParams = [

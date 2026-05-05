@@ -2067,7 +2067,7 @@ WHERE {$whereClause}";
    * @return CRM_Contribute_BAO_Contribution
    * @throws \CRM_Core_Exception
    */
-  public static function recordMembershipContribution(&$params) {
+  public static function recordMembershipContribution($params) {
     $contributionParams = [];
     $config = CRM_Core_Config::singleton();
     $contributionParams['currency'] = $config->defaultCurrency;
@@ -2139,9 +2139,6 @@ WHERE {$whereClause}";
         CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
       }
     }
-
-    // store contribution id
-    $params['contribution_id'] = $contribution->id;
 
     return $contribution;
   }

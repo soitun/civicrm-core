@@ -628,10 +628,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         }
       }
       $this->_params['contact_id'] = $this->_contactID;
-      //recordMembershipContribution receives params as a reference & adds one variable. This is
-      // not a great pattern & ideally it would not receive as a reference. We assign our params as a
-      // temporary variable to avoid e-notice & to make it clear to future refactorer that
-      // this function is NOT reliant on that var being set
       $temporaryParams = array_merge($this->_params, [
         'membership_id' => $membershipParams['id'],
         'contribution_recur_id' => $contributionRecurID,
