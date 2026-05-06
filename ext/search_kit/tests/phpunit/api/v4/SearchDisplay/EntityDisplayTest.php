@@ -66,6 +66,7 @@ class EntityDisplayTest extends Api4TestBase {
         'columns' => [
           [
             'key' => 'id',
+            'name' => 'contact_id',
             'label' => 'Contact ID',
             'type' => 'field',
           ],
@@ -131,13 +132,14 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('My New Entity', $info['title']);
     $this->assertSame('civicrm_sk_my_new_entity', $info['table_name']);
     $this->assertSame('secondary', $info['searchable']);
-    $this->assertSame(['id', 'first', 'last_name', 'prefix_id', 'created_date', 'modified_date'], $info['search_fields']);
+    $this->assertSame(['contact_id', 'first', 'last_name', 'prefix_id', 'created_date', 'modified_date'], $info['search_fields']);
+    $this->assertSame(['contact_id'], $info['primary_key']);
 
     $getFields = civicrm_api4('SK_MyNewEntity', 'getFields', ['loadOptions' => TRUE])->indexBy('name');
     $this->assertNotEmpty($getFields['prefix_id']['options'][1]);
-    $this->assertSame('Integer', $getFields['id']['data_type']);
-    $this->assertSame('EntityRef', $getFields['id']['input_type']);
-    $this->assertSame('Contact', $getFields['id']['fk_entity']);
+    $this->assertSame('Integer', $getFields['contact_id']['data_type']);
+    $this->assertSame('EntityRef', $getFields['contact_id']['input_type']);
+    $this->assertSame('Contact', $getFields['contact_id']['fk_entity']);
     $this->assertSame('String', $getFields['first']['data_type']);
     $this->assertSame('Text', $getFields['first']['input_type']);
     $this->assertNull($getFields['first']['fk_entity']);
@@ -542,6 +544,13 @@ class EntityDisplayTest extends Api4TestBase {
       ],
       'acl_bypass' => FALSE,
     ]);
+
+    $info = Entity::get(FALSE)
+      ->addWhere('name', '=', 'SK_TestEntityWithLongCustomFieldNameDbEntity1')
+      ->execute()->single();
+    $this->assertSame('testEntityWithLongCustomFieldName DB Entity 1', $info['title']);
+    $this->assertSame('secondary', $info['searchable']);
+    $this->assertSame(['id'], $info['primary_key']);
 
     $display = civicrm_api4('SearchDisplay', 'get', ['where' => [['name', '=', 'TestEntityWithLongCustomFieldNameDbEntity1']]])->single();
     $columnName = $display['settings']['columns'][0]['spec']['name'];
