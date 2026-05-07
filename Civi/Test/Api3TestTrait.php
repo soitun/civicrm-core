@@ -398,10 +398,11 @@ trait Api3TestTrait {
       }
       // Convert custom field names
       if (str_starts_with($name, 'custom_') && is_numeric($name[7])) {
-        // Strictly speaking, using titles instead of names is incorrect, but it works for
-        // unit tests where names and titles are identical and saves an extra db lookup.
-        $custom[$field['groupTitle']][$field['title']] = $name;
-        $v4FieldName = $field['groupTitle'] . '.' . $field['title'];
+        $customGroups = \CRM_Core_BAO_CustomGroup::getAll(['extends' => [$field['extends']]]);
+        $customGroupDetail = $customGroups[$field['custom_group_id']];
+        $customFieldDetail = $customGroupDetail['fields'][$field['custom_field_id']];
+        $custom[$customGroupDetail['name']][$customFieldDetail['name']] = $name;
+        $v4FieldName = $customGroupDetail['name'] . '.' . $customFieldDetail['name'];
         if (isset($v3Params[$name])) {
           $v3Params[$v4FieldName] = $v3Params[$name];
           unset($v3Params[$name]);
