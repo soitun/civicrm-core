@@ -2072,7 +2072,7 @@ ENDSQLUPDATE;
    * and left alone when it shouldn't.
    */
   public function testProcessMembershipUpdateStatus(): void {
-    $this->ids['MembershipType'] = $this->membershipTypeCreate();
+    $this->ids['MembershipType']['General'] = $this->membershipTypeCreate();
 
     // Create admin-only membership status and get all statuses.
     $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1])['id'];
@@ -2172,7 +2172,7 @@ ENDSQLUPDATE;
       'start_date' => date('Y-m-d', strtotime('now - 16 month')),
       'end_date' => date('Y-m-d', strtotime('now - 4 month')),
       // Intentionally incorrect status.
-      'status_id' => 'Grace',
+      'status_id:name' => 'Grace',
       // Don't calculate status.
       'skipStatusCal' => 1,
     ];
@@ -2206,7 +2206,7 @@ ENDSQLUPDATE;
     $membershipTypeId = $this->membershipTypeCreate();
 
     // Create admin-only membership status and get all statuses.
-    $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1, 'sequential' => 1]);
+    $this->callAPISuccess('MembershipStatus', 'create', ['name' => 'Admin', 'is_admin' => 1]);
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();
 
     // Default params, which we'll expand on below.
@@ -2256,22 +2256,21 @@ ENDSQLUPDATE;
    */
   protected function createMembershipNeedingStatusProcessing(string $startDate, string $endDate, string $status, bool $isAdminOverride = FALSE): int {
     $params = [
-      'membership_type_id' => $this->ids['MembershipType'],
+      'membership_type_id:name' => 'General',
       // Don't calculate status.
       'skipStatusCal' => 1,
       'source' => 'Test',
-      'sequential' => 1,
+      'version' => 4,
     ];
     $params['contact_id'] = $this->individualCreate();
     $params['join_date'] = date('Y-m-d', strtotime($startDate));
     $params['start_date'] = date('Y-m-d', strtotime($startDate));
     $params['end_date'] = date('Y-m-d', strtotime($endDate));
-    $params['sequential'] = TRUE;
     $params['is_override'] = $isAdminOverride;
     // Intentionally incorrect status.
-    $params['status_id'] = $status;
-    $resultNew = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertMembershipStatus($status, (int) $resultNew['values'][0]['status_id']);
+    $params['status_id:name'] = $status;
+    $resultNew = $this->createTestEntity('Membership', $params, 'new');
+    $this->assertMembershipStatus($status, (int) $resultNew['status_id']);
     return (int) $resultNew['id'];
   }
 
