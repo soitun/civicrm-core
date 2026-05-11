@@ -39,7 +39,6 @@ use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\MembershipType;
-use Civi\Api4\OptionGroup;
 use Civi\Api4\Phone;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -3831,14 +3830,7 @@ WHERE a1.is_primary = 0
    */
   protected function cleanupCustomGroups(): void {
     try {
-      CustomField::get(FALSE)->setSelect(['option_group_id', 'custom_group_id'])
-        ->addChain('delete_options', OptionGroup::delete()
-          ->addWhere('id', '=', '$option_group_id')
-        )
-        ->addChain('delete_fields', CustomField::delete()
-          ->addWhere('id', '=', '$id')
-        )->execute();
-
+      CustomField::delete(FALSE)->addWhere('id', '>', 0)->execute();
       CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
     }
     catch (CRM_Core_Exception $e) {
