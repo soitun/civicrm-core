@@ -116,6 +116,8 @@
             row.permissionToEdit = false;
           }
 
+          // Implied permission that if you can edit, you should be able to delete.
+          row.permissionToDelete = row.permissionToEdit;
           // If main entity doesn't exist, no can edit
           if (!row.data['api_entity:label']) {
             row.permissionToEdit = false;
@@ -128,9 +130,6 @@
           if (!row.data.display_name) {
             row.openDisplayMenu = false;
           }
-
-          // Implied permission that if you can edit, you should be able to delete.
-          row.permissionToDelete = row.permissionToEdit;
         });
         updateAfformCounts();
       });
