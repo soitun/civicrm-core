@@ -804,6 +804,66 @@
         return $location.path(newPath);
       }
 
+      this.getTokens = (includeSubmissionTokens = false) => {
+        const allTokens = [];
+        this.getEntities().forEach((entity) => {
+          const entityTokens = [];
+          const entityMeta = this.meta.entities[entity.type];
+          if (entityMeta.submissionTokens && includeSubmissionTokens) {
+            // Explicitly defined submission tokens e.g. by FormProcessor extension
+            entityMeta.submissionTokens.forEach((submissionToken) => {
+              entityTokens.push({
+                id: entity.name + '.0.' + submissionToken.token,
+                text: entity.label + ' ' + submissionToken.label,
+                description: submissionToken.description ?? '',
+              });
+            });
+          } else if (!entityMeta.submissionTokens) {
+            // Primary key token
+            // FIXME: not all entities use `id` for primary key
+            if (includeSubmissionTokens) {
+              entityTokens.push({
+                id: entity.name + '.0.id',
+                text: ts('%1 ID', {1: entity.label}),
+              });
+            }
+            // Tokens from entity data values
+            if (entity.data) {
+              Object.keys(entity.data).forEach((key) => {
+                if (entityMeta.fields[key]) {
+                  entityTokens.push({
+                    id: entity.name + '.0.' + key,
+                    text: entity.label + ' ' + entityMeta.fields[key].label,
+                  });
+                }
+              });
+            }
+            // Tokens from entity fields on the form
+            this.getEntityFields(entity.name).fields.forEach((field) => {
+              entityTokens.push({
+                id: entity.name + '.0.' + field.name,
+                text: entity.label + ' ' + field.label,
+              });
+            });
+          }
+          if (entityTokens.length) {
+            allTokens.push({
+              text: entity.label,
+              children: entityTokens,
+            });
+          }
+        });
+        if (includeSubmissionTokens) {
+          allTokens.push({
+            text: ts('Form'),
+            children: [
+              {id: 'token', text: ts('Submission JWT')},
+            ],
+          });
+        }
+        return allTokens;
+      };
+
     }
   });
 
