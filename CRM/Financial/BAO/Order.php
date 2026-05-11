@@ -1639,7 +1639,7 @@ class CRM_Financial_BAO_Order {
     if (empty($entityValues['id'])) {
       // Not an update, include any relevant values (e.g. contact_id) from the contribution
       // entity values if not present already in EntityFields.
-      $fields = (array) civicrm_api4($entity, 'getfields')->indexBy('name');
+      $fields = (array) civicrm_api4($entity, 'getfields', ['checkPermissions' => FALSE])->indexBy('name');
       $carryOverFields = array_intersect_key($this->contributionValues, $fields);
       if ($entity === 'Participant') {
         $carryOverFields += array_filter(['fee_amount' => $lineItem['unit_price'], 'fee_level' => $lineItem['label']]);
