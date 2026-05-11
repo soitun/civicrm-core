@@ -813,3 +813,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 .crm-container .pcp-page-text {
   margin-bottom: var(--crm-padding-reg);
 }
+
+civi-rich-text-input .rich-text-preview {
+  /* ensure a clickable target, even if empty */
+  min-height: 1rem;
+  cursor: cell;
+}
