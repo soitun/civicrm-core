@@ -197,28 +197,13 @@
       CRM.wysiwyg.focus(item);
     },
     // Create a "collapsed" textarea that expands into a wysiwyg when clicked
-    createCollapsed: function(item) {
-      $(item)
-        .hide()
-        .on('blur', function () {
-          CRM.wysiwyg.destroy(item);
-          $(item).hide().next('.replace-plain').show().html($(item).val());
-        })
-        .on('change', function() {
-          $(this).next('.replace-plain').html($(this).val());
-        })
-        .after('<div class="replace-plain" tabindex="0"></div>');
-      $(item).next('.replace-plain')
-        .attr('title', ts('Click to edit'))
-        .html($(item).val())
-        .on('click keypress', function (e) {
-          // Stop browser from opening clicked links
-          e.preventDefault();
-          $(item).show().next('.replace-plain').hide();
-          CRM.wysiwyg.create(item).then(() => {
-            CRM.wysiwyg.focus(item);
-          });
-        });
+    createCollapsed: (item) => {
+      const customInput = document.createElement('civi-rich-text-input');
+      // use the pre-existing textarea (preserve name etc) for the custom element
+      customInput.input = item;
+      customInput.input.style.display = 'none';
+      // replace the pre-existing textarea with our custom element
+      item.replaceWith(customInput);
     }
   };
 
