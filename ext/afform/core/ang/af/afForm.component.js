@@ -33,6 +33,13 @@
         $scope.$parent[this.ctrl] = this;
 
         $timeout(() => {
+          // render tokenised markup
+          $element[0].querySelectorAll('.af-markup:not(af-markup)').forEach((el) => {
+            const renderer = document.createElement('af-markup');
+            renderer.markup = el.innerHTML;
+            el.replaceChildren(renderer);
+          });
+
           ctrl.loadData()
             .then(setupDraftWatcher);
 
