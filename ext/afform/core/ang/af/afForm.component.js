@@ -576,8 +576,15 @@
 
         tokens.forEach((token) => {
           const parts = token.slice(1, -1).split('.');
-          values[token] = data[parts[0]][parts[1]].fields[parts.slice(2).join('.')];
-          values[token] = (values[token] === undefined) ? '' : values[token];
+          const entity = parts[0];
+          const index = parts[1];
+          const fieldName = parts.slice(2).join('.');
+          if (!data || !data[entity] || !data[entity][index] || !data[entity][index].fields || (data[entity][index].fields[fieldName] === undefined) ) {
+            values[token] = '';
+          }
+          else {
+            values[token] = data[entity][index].fields[fieldName];
+          }
         });
 
         return values;
