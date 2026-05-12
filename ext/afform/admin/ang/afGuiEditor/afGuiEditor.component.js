@@ -18,7 +18,7 @@
       mode: '@'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, crmUiHelp, afGui, $parse, $timeout, $location, $route, $rootScope, formatForSelect2) {
+    controller: function($scope, $element, crmApi4, crmUiHelp, afGui, $parse, $timeout, $location, $route, $rootScope, formatForSelect2) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       $scope.hs = crmUiHelp({file: 'CRM/AfformAdmin/afformBuilder'});
 
@@ -711,6 +711,9 @@
       };
 
       $scope.save = function() {
+        // save and close any open rich text elements
+        $element[0].querySelectorAll('civi-rich-text-input[editing]').forEach((el) => el.saveAndCloseEditor());
+
         const afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
