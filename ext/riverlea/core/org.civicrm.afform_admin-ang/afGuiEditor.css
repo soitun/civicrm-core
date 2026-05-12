@@ -701,3 +701,8 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l-large), transparent var(--crm-l-large) 100%) no-repeat;
   border-radius: var(--crm-l-radius);
 }
+
+/* hide label token pickers until editing */
+.af-gui-node-title:not(:focus-within) af-gui-token-select[field="label"] {
+  visibility: hidden;
+}

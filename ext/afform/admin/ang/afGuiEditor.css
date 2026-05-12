@@ -713,3 +713,8 @@ body.af-gui-dragging {
 #bootstrap-theme.af-gui-conditional-dialog .api4-operator {
   width: 110px;
 }
+
+/* hide label token pickers until editing */
+.af-gui-node-title:not(:focus-within) af-gui-token-select[field="label"] {
+  visibility: hidden;
+}
