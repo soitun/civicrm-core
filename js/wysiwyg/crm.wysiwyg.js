@@ -55,7 +55,7 @@
       this.preview.title = ts('Click to edit');
 
       // (re)load any content
-      this.preview.innerHTML = this.value;
+      this.renderPreview();
 
       // open the editor when click/type on preview
       this.preview.onclick = (e) => {
@@ -74,6 +74,11 @@
       if (this.hasAttribute('token-picker')) {
         this.loadTokenPicker();
       }
+    }
+
+    renderPreview() {
+      // if no content set, show an edit icon instead
+      this.preview.innerHTML = this.value.length ? this.value : '<i class="crm-i fa-pencil" role="img" aria-label="Edit"></i>';
     }
 
     loadTokenPicker() {
@@ -133,10 +138,13 @@
     }
 
     set value(v) {
+      if (!v) {
+        v = '';
+      }
       this.input.value = v;
       CRM.wysiwyg.setVal(this.input, v);
       if (this.preview) {
-        this.preview.innerHTML = v;
+        this.renderPreview();
       }
     }
   }

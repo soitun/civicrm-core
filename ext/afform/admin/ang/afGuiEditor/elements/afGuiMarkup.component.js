@@ -19,8 +19,7 @@
       this.$onInit = () => {
 
         // When creating a new markup container, go straight to edit mode
-        if (this.node['#markup'] === false) {
-          this.node['#markup'] = '';
+        if (!this.node['#markup']) {
           this.edit();
         }
       };
