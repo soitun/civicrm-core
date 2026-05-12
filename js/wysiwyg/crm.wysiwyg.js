@@ -120,7 +120,7 @@
       if (this.closest('af-gui-editor')) {
         const afGuiEditor = angular.element(this.closest('af-gui-editor')).controller('afGuiEditor');
         return {
-          results: afGuiEditor.getTokens()
+          results: afGuiEditor.getTokens(this.hasAttribute('include-submission-tokens'))
         };
       }
       else {

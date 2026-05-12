@@ -819,3 +819,6 @@ civi-rich-text-input .rich-text-preview {
   min-height: 1rem;
   cursor: cell;
 }
+civi-rich-text-input .rich-text-preview:hover {
+  outline: 2px dashed var(--crm-c-blue-dark);
+}
