@@ -706,3 +706,12 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 .af-gui-node-title:not(:focus-within) af-gui-token-select[field="label"] {
   visibility: hidden;
 }
+
+/* suppress input styling on form elements */
+af-gui-container civi-rich-text-input .rich-text-preview {
+  border: none;
+  background: none;
+}
+af-gui-container civi-rich-text-input .rich-text-preview:hover {
+  outline: 2px dashed var(--crm-c-blue-dark);
+}
