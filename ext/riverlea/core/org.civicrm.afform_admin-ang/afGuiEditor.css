@@ -615,7 +615,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   padding-inline: var(--crm-l-medium);
   width: 110px;
   margin-left: var(--crm-l-xsmall-2);
-  border: 1px solid var(--crm-input-border-color);
+  border: var(--crm-input-border);
   border-radius: 2px;
 }
 #afGuiEditor li.disabled a strong {
