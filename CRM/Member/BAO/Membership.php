@@ -2064,6 +2064,8 @@ WHERE {$whereClause}";
    * @param array $params
    *   Array of submitted params.
    *
+   * @deprecated use Order api
+   *
    * @return CRM_Contribute_BAO_Contribution
    * @throws \CRM_Core_Exception
    */
