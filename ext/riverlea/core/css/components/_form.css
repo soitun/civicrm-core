@@ -144,7 +144,8 @@ select.crm-form-multiselect,
 select.crm-form-select,
 .crm-container .ui-widget input,
 .crm-container select,
-.ui-datepicker .ui-datepicker-header select {
+.ui-datepicker .ui-datepicker-header select,
+civi-rich-text-input .rich-text-preview {
   transition: var(--crm-input-active-transition);
   font-size: var(--crm-input-font-size);
   background-color: var(--crm-input-bg-color);
@@ -995,4 +996,11 @@ span.crm-select-item-color {
 }
 .crm-container :is(input,textarea,option):disabled {
   background-color: color-mix(in srgb, var(--crm-input-bg-color) 90%, var(--crm-ink) 10%);
+}
+
+civi-rich-text-input .rich-text-preview {
+  height: unset;
+  width: unset;
+  min-height: var(--crm-input-height);
+  cursor: cell;
 }
