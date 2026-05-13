@@ -726,12 +726,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @return int
    */
   public function contactMembershipCreate(array $params): int {
+    if (isset($params['skipLineItem']) || ($params['version'] ?? 4) === 3) {
+      throw new CRM_Core_Exception('function expects to use api v4 ');
+    }
     $params = array_merge([
       'join_date' => '2007-01-21',
       'start_date' => '2007-01-21',
       'end_date' => '2007-12-21',
       'source' => 'Payment',
       'membership_type_id' => 'General',
+      'version' => 4,
     ], $params);
     if (!is_numeric($params['membership_type_id'])) {
       $membershipTypes = $this->callAPISuccess('Membership', 'getoptions', ['action' => 'create', 'field' => 'membership_type_id']);
