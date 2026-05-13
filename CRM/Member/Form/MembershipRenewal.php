@@ -508,7 +508,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
     $this->_params['invoice_id'] = $this->getInvoiceID();
 
-    if (!empty($this->_params['send_receipt'])) {
+    if ($this->getSubmittedValue('send_receipt')) {
       $this->_params['receipt_date'] = $now;
       $this->assign('receipt_date', CRM_Utils_Date::mysqlToIso($this->_params['receipt_date']));
     }
@@ -527,7 +527,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // all the payment processors expect the name and address to be in the passed params
       // so we copy stuff over to first_name etc.
       $paymentParams = $this->_params;
-      if (!empty($this->_params['send_receipt'])) {
+      if ($this->getSubmittedValue('send_receipt')) {
         $paymentParams['email'] = $this->_contributorEmail;
       }
 
@@ -543,7 +543,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'contribution_status_id' => 'Pending',
           'payment_processor_id' => $this->_params['payment_processor_id'],
           'financial_type_id' => $this->_params['financial_type_id'],
-          'is_email_receipt' => !empty($this->_params['send_receipt']),
+          'is_email_receipt' => (bool) $this->getSubmittedValue('send_receipt'),
           'payment_instrument_id' => $this->_params['payment_instrument_id'],
           'invoice_id' => $this->getInvoiceID(),
         ], $paymentParams['membership_type_id'][1]);
@@ -635,7 +635,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->setContributionID(CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams)->id);
     }
 
-    if (!empty($this->_params['send_receipt'])) {
+    if ($this->getSubmittedValue('send_receipt')) {
       $this->sendReceipt();
     }
   }
