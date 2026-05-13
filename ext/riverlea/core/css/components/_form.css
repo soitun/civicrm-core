@@ -151,7 +151,7 @@ select.crm-form-select,
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   color: var(--crm-input-color);
-  border: 1px solid var(--crm-input-border-color);
+  border: var(--crm-input-border);
   padding: var(--crm-input-padding);
   height: var(--crm-input-height);
   width: var(--crm-input-width);
@@ -463,7 +463,7 @@ input.crm-form-checkbox) + label {
 .crm-container .select2-container-multi .select2-choices,
 .crm-container .select2-container .select2-choice {
   background: var(--crm-input-bg-color);
-  border: 1px solid var(--crm-input-border-color);
+  border: var(--crm-input-border);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   height: var(--crm-input-height) !important /* vs select2.min.css */;
@@ -680,7 +680,7 @@ span.crm-select-item-color {
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
   background: var(--crm-container-bg-color);
-  border: 1px solid var(--crm-input-border-color);
+  border: var(--crm-input-border);
   border-radius: var(--crm-input-border-radius);
   box-sizing: border-box;
   height: var(--crm-l-large);
