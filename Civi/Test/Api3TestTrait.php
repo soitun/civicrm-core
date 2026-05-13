@@ -190,6 +190,26 @@ trait Api3TestTrait {
   }
 
   /**
+   * Wrapper for call api success with version 3.
+   *
+   * The intent here is to make the intention that the api call targets apiV3 explicit (ie
+   * when testing apiV3 functions). This will allow us to start setting the default api version
+   * at the class level to 4, even for classes in the api test suite but explicitly marking those
+   * that should remain at v3.
+   *
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @param int|array|null $checkAgainst
+   *
+   * @return array|int
+   */
+  public function callApiV3Success(string $entity, string $action, array $params = [], int|array|null $checkAgainst = NULL): array|int {
+    $params['version'] = 3;
+    return $this->callAPISuccess($entity, $action, $params, $checkAgainst);
+  }
+
+  /**
    * This function exists to wrap api getValue function & check the result
    * so we can ensure they succeed & throw exceptions without littering the test with checks
    * There is a type check in this
