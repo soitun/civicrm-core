@@ -1766,11 +1766,10 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       ->execute()->single();
     $membershipId = $line['entity_id'];
 
-    $contributionParams['contribution_id'] = $contribution1['id'];
-
-    // 2nd Payment
+    // 2nd Membership Order.
     $contribution2 = Order::create()
-      ->setContributionValues($contributionParams)
+      // Date is earlier than contribution 1 for consistent search order results.
+      ->setContributionValues(['receive_date' => '2020-08-07'] + $contributionParams)
       ->addLineItem([
         'entity_table' => 'civicrm_membership',
         'entity_id.id' => $membershipId,
