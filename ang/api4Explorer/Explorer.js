@@ -1346,6 +1346,7 @@ apiCalls.${results} = [${jsCall}];
             op = field.serialize || dataType === 'Array' ? 'IN' : '=';
           }
           multi = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'].includes(op);
+          let regexp = op.includes('REGEXP');
           // IS NULL, IS EMPTY, etc.
           if (op.includes('IS ')) {
             $el.hide();
@@ -1378,7 +1379,7 @@ apiCalls.${results} = [${jsCall}];
                 {id: 'false', text: ts('No')}
               ]});
             }
-          } else if (dataType === 'Integer' && !multi) {
+          } else if (dataType === 'Integer' && !multi && !regexp) {
             $el.attr('type', 'number');
           }
         }
