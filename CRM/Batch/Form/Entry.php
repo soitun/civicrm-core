@@ -17,6 +17,8 @@
 
 use Civi\API\EntityLookupTrait;
 use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
+use Civi\Api4\Order;
 
 /**
  * This class provides the functionality for batch entry for contributions/memberships.
@@ -846,18 +848,23 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $this->setCurrentRowMembershipID($membership->id);
         }
         else {
-          $createdOrder = civicrm_api3('Order', 'create', [
-            'line_items' => $order->getLineItemForV3OrderApi(),
-            'receive_date' => $this->currentRow['receive_date'],
-            'check_number' => $this->currentRow['check_number'] ?? '',
-            'contact_id' => $this->getCurrentRowContactID(),
-            'batch_id' => $this->_batchId,
-            'financial_type_id' => $this->currentRow['financial_type_id'],
-            'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
-          ]);
+          $createdOrder = Order::create(FALSE)
+            ->setLineItems($order->getLineItemsForV4OrderApi())
+            ->setContributionValues([
+              'receive_date' => $this->currentRow['receive_date'],
+              'check_number' => $this->currentRow['check_number'] ?? '',
+              'contact_id' => $this->getCurrentRowContactID(),
+              'batch_id' => $this->_batchId,
+              'financial_type_id' => $this->currentRow['financial_type_id'],
+              'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
+            ])->execute()->single();
           $this->currentRowContributionID = $createdOrder['id'];
 
-          $this->setCurrentRowMembershipID($createdOrder['values'][$this->getCurrentRowContributionID()]['line_item'][0]['entity_id']);
+          $this->setCurrentRowMembershipID(LineItem::get(FALSE)
+            ->addWhere('contribution_id', '=', $createdOrder['id'])
+            ->addWhere('entity_table', '=', 'civicrm_membership')
+            ->execute()->first()['entity_id']);
+
           if ($this->getCurrentRowPaymentStatus() === 'Completed') {
             civicrm_api3('Payment', 'create', [
               'total_amount' => $order->getTotalAmount() + $order->getTotalTaxAmount(),
@@ -1064,7 +1071,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   private function getCurrentRowMembershipParams(): array {
-    return array_merge($this->getCurrentRowCustomParams(), [
+    return array_merge($this->getCurrentRowCustomParams(4), [
       'start_date' => $this->currentRow['membership_start_date'] ?? NULL,
       'end_date' => $this->currentRow['membership_end_date'] ?? NULL,
       'join_date' => $this->currentRow['membership_join_date'] ?? NULL,

@@ -195,10 +195,10 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d', strtotime('last day of December 2013')), $memberships[2]['end_date']);
     $this->assertEquals('2013-12-01', $memberships[3]['end_date']);
 
-    //check start dates #1 should default to 1 Jan this year, #2 should be as entered
+    //check start dates #1 should default to 1 Jan this year, #2 should be as entered, 3 is from receive_date
     $this->assertEquals(date('Y-m-d', strtotime('07/22/2013')), $memberships[1]['join_date']);
     $this->assertEquals(date('Y-m-d', strtotime('07/03/2013')), $memberships[2]['join_date']);
-    $this->assertEquals(date('Y-m-d'), $memberships[3]['join_date']);
+    $this->assertEquals('2013-07-17', $memberships[3]['join_date']);
     $memberships = $this->callAPISuccess('Contribution', 'get', ['return' => ['total_amount', 'trxn_id']]);
     $this->assertEquals(3, $memberships['count']);
     foreach ($memberships['values'] as $key => $contribution) {
