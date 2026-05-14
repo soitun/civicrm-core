@@ -36,6 +36,13 @@ use Civi\Api4\LineItem;
 class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * @var int
    */
   protected $relationshipTypeID;
