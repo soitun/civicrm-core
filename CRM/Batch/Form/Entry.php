@@ -1078,13 +1078,19 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Get the custom value parameters from the current row.
    *
+   * @param int $version
+   *
    * @return array
    */
-  private function getCurrentRowCustomParams(): array {
+  private function getCurrentRowCustomParams(int $version = 3): array {
     $return = [];
     foreach ($this->currentRow as $field => $value) {
       if (str_starts_with($field, 'custom_')) {
-        $return[$field] = $value;
+        $fieldName = $field;
+        if ($version === 4) {
+          $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName($field);
+        }
+        $return[$fieldName] = $value;
       }
     }
     return $return;
