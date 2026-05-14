@@ -1451,6 +1451,26 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the constructed line items formatted for the v3 Order api.
+   *
+   * @return array
+   *
+   * @internal core tested code only.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItemsForV4OrderApi(): array {
+    $lineItems = [];
+    foreach ($this->getLineItems() as $key => $line) {
+      foreach ($this->entityParameters[$key] as $fieldName => $entityParameter) {
+        $line['entity_id.' . $fieldName] = $entityParameter;
+      }
+      $lineItems[] = $line;
+    }
+    return $lineItems;
+  }
+
+  /**
    * @return array
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
@@ -1680,14 +1700,7 @@ class CRM_Financial_BAO_Order {
         if (empty($statusIDKey) || empty($entityValues[$statusIDKey])) {
           // For the Membership entity, we didn't pass in a value for "status" so we are going to calculate membership status
           //   from membership dates and membership type.
-          $entityValues['status_id'] = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
-            $entityValues['start_date'] ?? NULL,
-            $entityValues['end_date'] ?? NULL,
-            $entityValues['join_date'] ?? NULL,
-            $this->contributionValues['receive_date'],
-            TRUE,
-            $entityValues['membership_type_id']
-          )['id'];
+          $entityValues['status_id:name'] = 'Pending';
         }
       }
     }
