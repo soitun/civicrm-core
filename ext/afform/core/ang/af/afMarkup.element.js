@@ -9,9 +9,6 @@
 
     connectedCallback() {
       this.afForm = this.closest('af-form');
-      if (!this.afForm) {
-        throw new Error('af-markup should be placed within an af-form');
-      }
       // setTimeout ensures child elements can access parent af-form during render
       setTimeout(() => this.render());
     }
@@ -22,7 +19,11 @@
 
     render() {
       let markup = this.markup;
-      markup = this.replaceTokensWithElements(markup);
+      if (this.afForm) {
+        // at time of writing, token replacement is only supported
+        // inside af-form (*not* search forms)
+        markup = this.replaceTokensWithElements(markup);
+      }
       this.innerHTML = markup;
     }
 
